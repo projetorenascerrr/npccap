@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Course;
 use App\Models\Certificate;
+use App\Models\Student;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 
@@ -10,29 +12,59 @@ class CertificateController extends Controller
 {
     public function index()
     {
-        $certificates = Certificate::query()
+        $certificates = Certificate::with(['course', 'student'])
             ->latest()
             ->get();
 
+        $courses = Course::with('students')
+            ->orderBy('name')
+            ->get();
+
+        $coursesForJs = $courses->map(function (Course $course) {
+            return [
+                'id' => $course->id,
+                'name' => $course->name,
+                'students' => $course->students->map(function (Student $student) {
+                    return [
+                        'id' => $student->id,
+                        'name' => $student->name,
+                        'cpf' => $student->cpf,
+                    ];
+                })->values(),
+            ];
+        })->values();
+
         return view('certificates.index', [
             'certificates' => $certificates,
+            'courses' => $courses,
+            'coursesForJs' => $coursesForJs,
         ]);
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'student_name' => ['required', 'string', 'max:255'],
-            'cpf' => ['required', 'string', 'regex:/^(\d{11}|\d{3}\.\d{3}\.\d{3}-\d{2})$/'],
-            'course_name' => ['required', 'string', 'max:255'],
+            'course_id' => ['required', 'exists:courses,id'],
+            'student_id' => ['required', 'exists:students,id'],
             'issue_date' => ['required', 'date'],
         ], [
-            'cpf.regex' => 'O CPF deve ter 11 digitos ou estar no formato 000.000.000-00.',
+            'course_id.required' => 'Selecione um curso.',
+            'student_id.required' => 'Selecione um aluno.',
         ]);
 
-        $validated['cpf'] = $this->normalizeCpf($validated['cpf']);
+        $course = Course::findOrFail($validated['course_id']);
+        $student = Student::whereKey($validated['student_id'])
+            ->where('course_id', $course->id)
+            ->firstOrFail();
 
-        $certificate = Certificate::create($validated);
+        $certificate = Certificate::create([
+            'course_id' => $course->id,
+            'student_id' => $student->id,
+            'student_name' => $student->name,
+            'cpf' => $student->cpf,
+            'course_name' => $course->name,
+            'issue_date' => $validated['issue_date'],
+        ]);
 
         return redirect()
             ->route('certificates.index')

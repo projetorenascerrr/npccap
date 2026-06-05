@@ -1,255 +1,158 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema de Certificados - NPCCAP</title>
-    <style>
-        :root {
-            --bg: #f6f1e8;
-            --surface: #ffffff;
-            --ink: #1e2a32;
-            --accent: #ad7a2f;
-            --accent-soft: #e8d5b6;
-            --line: #d8c5a4;
-        }
+@extends('layouts.app')
 
-        * {
-            box-sizing: border-box;
-        }
+@section('title', 'Certificados - NPCCAP')
+@section('page_title', 'Certificados')
 
-        body {
-            margin: 0;
-            font-family: Georgia, "Times New Roman", serif;
-            color: var(--ink);
-            background:
-                radial-gradient(circle at 10% 10%, #fff7e6 0%, transparent 45%),
-                radial-gradient(circle at 90% 90%, #f4e6cc 0%, transparent 40%),
-                var(--bg);
-            min-height: 100vh;
-            padding: 24px;
-        }
-
-        .wrapper {
-            max-width: 1100px;
-            margin: 0 auto;
-            display: grid;
-            gap: 20px;
-        }
-
-        .card {
-            background: var(--surface);
-            border: 1px solid var(--line);
-            border-radius: 16px;
-            padding: 24px;
-            box-shadow: 0 10px 30px rgba(30, 42, 50, 0.08);
-        }
-
-        h1 {
-            margin: 0 0 8px;
-            letter-spacing: 0.04em;
-        }
-
-        p {
-            margin-top: 0;
-        }
-
-        .form-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 14px;
-            align-items: end;
-        }
-
-        label {
-            display: block;
-            font-size: 0.92rem;
-            margin-bottom: 6px;
-            font-weight: 700;
-        }
-
-        input {
-            width: 100%;
-            border: 1px solid var(--line);
-            border-radius: 10px;
-            padding: 10px 12px;
-            font-size: 1rem;
-        }
-
-        button {
-            border: 0;
-            border-radius: 10px;
-            background: var(--accent);
-            color: #fff;
-            font-weight: 700;
-            padding: 11px 16px;
-            cursor: pointer;
-        }
-
-        .alert {
-            border-radius: 10px;
-            padding: 10px 12px;
-            margin-bottom: 14px;
-        }
-
-        .alert-success {
-            background: #ebf8ee;
-            border: 1px solid #96d4a2;
-        }
-
-        .alert-error {
-            background: #fff1f1;
-            border: 1px solid #e4a8a8;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.95rem;
-        }
-
-        th,
-        td {
-            text-align: left;
-            border-bottom: 1px solid var(--line);
-            padding: 10px 8px;
-        }
-
-        th {
-            background: var(--accent-soft);
-        }
-
-        .btn-link {
-            text-decoration: none;
-            background: #2f5c8f;
-            color: #fff;
-            padding: 8px 12px;
-            border-radius: 8px;
-            display: inline-block;
-            font-size: 0.85rem;
-        }
-
-        @media (max-width: 700px) {
-            body {
-                padding: 12px;
-            }
-
-            .card {
-                padding: 16px;
-            }
-
-            table,
-            thead,
-            tbody,
-            tr,
-            td,
-            th {
-                display: block;
-            }
-
-            thead {
-                display: none;
-            }
-
-            tr {
-                border: 1px solid var(--line);
-                border-radius: 10px;
-                margin-bottom: 12px;
-                padding: 8px;
-            }
-
-            td {
-                border: 0;
-                padding: 6px 0;
-            }
-        }
-
-    </style>
-</head>
-<body>
-    <div class="wrapper">
-        <section class="card">
-            <h1>NPCCAP - Gerador de Certificados</h1>
-            <p>Cadastre curso, aluno e CPF para gerar um certificado A4 horizontal em PDF.</p>
-
-            @if (session('success'))
-            <div class="alert alert-success">{{ session('success') }}</div>
-            @endif
-
-            @if ($errors->any())
-            <div class="alert alert-error">
-                <strong>Erros encontrados:</strong>
-                <ul>
-                    @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
+@section('content')
+<div class="row g-4">
+    <div class="col-12 col-xxl-8">
+        <div class="hero-card rounded-4 p-4 p-lg-5 h-100">
+            <div class="d-flex flex-column flex-lg-row justify-content-between gap-3 mb-4">
+                <div>
+                    <p class="text-uppercase text-soft small mb-1">Sistema de Certificados</p>
+                    <h1 class="h3 mb-2">Cadastro de certificados</h1>
+                    <p class="mb-0 text-soft">Selecione o curso, escolha o aluno daquele curso e gere o certificado em PDF.</p>
+                </div>
+                <div class="d-flex gap-2 flex-wrap align-items-start">
+                    <a class="btn btn-outline-light" href="{{ route('courses.index') }}">Gerenciar cursos</a>
+                    <a class="btn btn-brand text-white" href="{{ route('courses.create') }}">Criar novo curso</a>
+                </div>
             </div>
-            @endif
 
-            <form method="POST" action="{{ route('certificates.store') }}">
+            <form method="POST" action="{{ route('certificates.store') }}" class="row g-3" id="certificateForm">
                 @csrf
-                <div class="form-grid">
-                    <div>
-                        <label for="student_name">Nome do Aluno</label>
-                        <input id="student_name" name="student_name" value="{{ old('student_name') }}" required>
-                    </div>
+                <div class="col-12 col-md-5">
+                    <label for="course_id" class="form-label">Curso</label>
+                    <select id="course_id" name="course_id" class="form-select" required>
+                        <option value="">Selecione um curso</option>
+                        @foreach ($courses as $course)
+                        <option value="{{ $course->id }}" @selected(old('course_id')==$course->id)>{{ $course->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
 
-                    <div>
-                        <label for="cpf">CPF</label>
-                        <input id="cpf" name="cpf" value="{{ old('cpf') }}" placeholder="000.000.000-00" required>
-                    </div>
+                <div class="col-12 col-md-5">
+                    <label for="student_id" class="form-label">Aluno</label>
+                    <select id="student_id" name="student_id" class="form-select" required>
+                        <option value="">Selecione um curso primeiro</option>
+                    </select>
+                </div>
 
-                    <div>
-                        <label for="course_name">Curso</label>
-                        <input id="course_name" name="course_name" value="{{ old('course_name') }}" required>
-                    </div>
+                <div class="col-12 col-md-2">
+                    <label for="issue_date" class="form-label">Data</label>
+                    <input id="issue_date" name="issue_date" type="date" class="form-control" value="{{ old('issue_date', date('Y-m-d')) }}" required>
+                </div>
 
-                    <div>
-                        <label for="issue_date">Data de Emissao</label>
-                        <input id="issue_date" name="issue_date" type="date" value="{{ old('issue_date', date('Y-m-d')) }}" required>
-                    </div>
-
-                    <div>
-                        <button type="submit">Salvar Certificado</button>
-                    </div>
+                <div class="col-12 d-flex gap-2 flex-wrap">
+                    <button type="submit" class="btn btn-brand text-white">Salvar certificado</button>
+                    <button type="button" class="btn btn-outline-light" id="clearSelection">Limpar seleção</button>
                 </div>
             </form>
-        </section>
-
-        <section class="card">
-            <h2>Certificados Cadastrados</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Aluno</th>
-                        <th>CPF</th>
-                        <th>Curso</th>
-                        <th>Data</th>
-                        <th>Acoes</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse ($certificates as $certificate)
-                    <tr>
-                        <td>{{ $certificate->id }}</td>
-                        <td>{{ $certificate->student_name }}</td>
-                        <td>{{ $certificate->cpf }}</td>
-                        <td>{{ $certificate->course_name }}</td>
-                        <td>{{ $certificate->issue_date->format('d/m/Y') }}</td>
-                        <td>
-                            <a class="btn-link" href="{{ route('certificates.pdf', $certificate) }}" target="_blank">Gerar PDF</a>
-                        </td>
-                    </tr>
-                    @empty
-                    <tr>
-                        <td colspan="6">Nenhum certificado cadastrado ainda.</td>
-                    </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </section>
+        </div>
     </div>
-</body>
-</html>
+
+    <div class="col-12 col-xxl-4">
+        <div class="panel-card rounded-4 p-4 h-100">
+            <p class="text-uppercase text-soft small mb-1">Resumo</p>
+            <h2 class="h5 mb-3">Estrutura ativa</h2>
+            <div class="d-grid gap-3">
+                <div class="border border-secondary rounded-3 p-3 bg-body-tertiary bg-opacity-10">
+                    <div class="text-soft small">Cursos cadastrados</div>
+                    <div class="fs-4 fw-semibold">{{ $courses->count() }}</div>
+                </div>
+                <div class="border border-secondary rounded-3 p-3 bg-body-tertiary bg-opacity-10">
+                    <div class="text-soft small">Certificados emitidos</div>
+                    <div class="fs-4 fw-semibold">{{ $certificates->count() }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12">
+        <div class="panel-card rounded-4 p-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                    <p class="text-uppercase text-soft small mb-1">Histórico</p>
+                    <h2 class="h5 mb-0">Certificados cadastrados</h2>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-dark table-hover align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Curso</th>
+                            <th>Aluno</th>
+                            <th>CPF</th>
+                            <th>Data</th>
+                            <th class="text-end">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse ($certificates as $certificate)
+                        <tr>
+                            <td>{{ $certificate->id }}</td>
+                            <td>{{ $certificate->course_name }}</td>
+                            <td>{{ $certificate->student_name }}</td>
+                            <td>{{ $certificate->cpf }}</td>
+                            <td>{{ $certificate->issue_date->format('d/m/Y') }}</td>
+                            <td class="text-end">
+                                <a class="btn btn-sm btn-outline-info" href="{{ route('certificates.pdf', $certificate) }}" target="_blank">Gerar PDF</a>
+                            </td>
+                        </tr>
+                        @empty
+                        <tr>
+                            <td colspan="6" class="text-center text-soft py-4">Nenhum certificado cadastrado ainda.</td>
+                        </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+@endsection
+
+@push('scripts')
+<script>
+    const courses = @json($coursesForJs);
+    const courseSelect = document.getElementById('course_id');
+    const studentSelect = document.getElementById('student_id');
+    const oldStudentId = @json(old('student_id'));
+    const clearSelection = document.getElementById('clearSelection');
+
+    function loadStudents(courseId) {
+        const course = courses.find((item) => String(item.id) === String(courseId));
+        studentSelect.innerHTML = '';
+
+        if (!course || !course.students.length) {
+            studentSelect.innerHTML = '<option value="">Nenhum aluno cadastrado neste curso</option>';
+            return;
+        }
+
+        studentSelect.innerHTML = '<option value="">Selecione um aluno</option>';
+
+        course.students.forEach((student) => {
+            const option = document.createElement('option');
+            option.value = student.id;
+            option.textContent = `${student.name} - ${student.cpf}`;
+            if (String(student.id) === String(oldStudentId)) {
+                option.selected = true;
+            }
+            studentSelect.appendChild(option);
+        });
+    }
+
+    courseSelect.addEventListener('change', (event) => loadStudents(event.target.value));
+    clearSelection.addEventListener('click', () => {
+        courseSelect.value = '';
+        studentSelect.innerHTML = '<option value="">Selecione um curso primeiro</option>';
+    });
+
+    if (courseSelect.value) {
+        loadStudents(courseSelect.value);
+    }
+
+</script>
+@endpush
