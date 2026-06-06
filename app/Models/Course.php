@@ -20,6 +20,11 @@ class Course extends Model
         'image_path',
     ];
 
+    protected $casts = [
+        'course_date' => 'date',
+        'hours' => 'integer',
+    ];
+
     public function students(): HasMany
     {
         return $this->hasMany(Student::class);

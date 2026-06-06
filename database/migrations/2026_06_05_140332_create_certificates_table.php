@@ -13,6 +13,8 @@ return new class extends Migration
     {
         Schema::create('certificates', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('course_id')->nullable()->constrained()->nullOnDelete();
+            $table->foreignId('student_id')->nullable()->constrained()->nullOnDelete();
             $table->string('student_name');
             $table->string('cpf', 14);
             $table->string('course_name');
