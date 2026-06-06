@@ -138,6 +138,21 @@
             border-top: 0.4mm solid #2c2a26;
         }
 
+        .qr-area {
+            position: absolute;
+            right: 8mm;
+            bottom: 8mm;
+            text-align: center;
+            font-size: 3mm;
+            color: #5a4219;
+        }
+
+        .validation-code {
+            margin-top: 8mm;
+            font-size: 3.5mm;
+            color: #7a5a20;
+            letter-spacing: 0.5mm;
+        }
     </style>
 </head>
 
@@ -152,15 +167,19 @@
 
     <div class="certificate">
         <div class="inner">
-            <p>A Secretaria de Estado da Justiça e da Cidadania por intermédio do Núcleo Pedagógico de Capacitação Continuada,<br>confere a</p>
-            <div class="name">{{ $certificate->student_name }}</div>
-            <p>CPF: {{ $certificate->cpf }}</p>
-            <p>concluiu com aproveitamento o curso:</p>
+            <p><i>A Secretaria de Estado da Justiça e da Cidadania<br>por intermédio do Núcleo Pedagógico de Capacitação
+                    Continuada, confere a</i></p>
+            <div class="name text-uppercase">{{ $certificate->student_name }}</div>
+            <p>CPF: {{ $certificate->cpf }} concluiu com aproveitamento o curso de:</p>
             <div class="course">{{ $certificate->course_name }}</div>
 
             <div class="meta">
                 Emitido em {{ $certificate->issue_date->format('d/m/Y') }}.
             </div>
+
+            @if ($certificate->validation_code)
+            <div class="validation-code">Código: {{ $certificate->validation_code }}</div>
+            @endif
         </div>
 
         <div class="signatures">
@@ -174,6 +193,13 @@
             </div>
         </div>
     </div>
+
+    @if (!empty($qrCodeSvg))
+    <div class="qr-area">
+        {!! $qrCodeSvg !!}
+        <div>Validar certificado</div>
+    </div>
+    @endif
 
 </body>
 

@@ -41,13 +41,19 @@ class CourseController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'description' => ['nullable', 'string'],
-            'hours' => ['nullable', 'integer', 'min:1'],
-            'course_date' => ['nullable', 'date'],
-            'ass1' => ['nullable', 'string', 'max:255'],
-            'ass2' => ['nullable', 'string', 'max:255'],
-            'image' => ['nullable', 'image', 'max:5120'],
+            'name'              => ['required', 'string', 'max:255'],
+            'description'       => ['nullable', 'string'],
+            'hours'             => ['nullable', 'integer', 'min:1'],
+            'course_date'       => ['nullable', 'date'],
+            'start_date'        => ['nullable', 'date'],
+            'end_date'          => ['nullable', 'date', 'after_or_equal:start_date'],
+            'responsible'       => ['nullable', 'string', 'max:255'],
+            'minimum_frequency' => ['nullable', 'numeric', 'min:0', 'max:100'],
+            'minimum_grade'     => ['nullable', 'numeric', 'min:0', 'max:10'],
+            'status'            => ['nullable', 'in:ativo,encerrado,cancelado'],
+            'ass1'              => ['nullable', 'string', 'max:255'],
+            'ass2'              => ['nullable', 'string', 'max:255'],
+            'image'             => ['nullable', 'image', 'max:5120'],
         ]);
 
         if ($request->hasFile('image')) {
@@ -73,13 +79,19 @@ class CourseController extends Controller
     public function update(Request $request, Course $course)
     {
         $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'description' => ['nullable', 'string'],
-            'hours' => ['nullable', 'integer', 'min:1'],
-            'course_date' => ['nullable', 'date'],
-            'ass1' => ['nullable', 'string', 'max:255'],
-            'ass2' => ['nullable', 'string', 'max:255'],
-            'image' => ['nullable', 'image', 'max:5120'],
+            'name'              => ['required', 'string', 'max:255'],
+            'description'       => ['nullable', 'string'],
+            'hours'             => ['nullable', 'integer', 'min:1'],
+            'course_date'       => ['nullable', 'date'],
+            'start_date'        => ['nullable', 'date'],
+            'end_date'          => ['nullable', 'date', 'after_or_equal:start_date'],
+            'responsible'       => ['nullable', 'string', 'max:255'],
+            'minimum_frequency' => ['nullable', 'numeric', 'min:0', 'max:100'],
+            'minimum_grade'     => ['nullable', 'numeric', 'min:0', 'max:10'],
+            'status'            => ['nullable', 'in:ativo,encerrado,cancelado'],
+            'ass1'              => ['nullable', 'string', 'max:255'],
+            'ass2'              => ['nullable', 'string', 'max:255'],
+            'image'             => ['nullable', 'image', 'max:5120'],
         ]);
 
         if ($request->hasFile('image')) {
@@ -125,19 +137,33 @@ class CourseController extends Controller
     {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'cpf' => ['required', 'string', 'regex:/^(\d{11}|\d{3}\.\d{3}\.\d{3}-\d{2})$/'],
+            'cpf'   => ['required', 'string', 'regex:/^(\d{11}|\d{3}\.\d{3}\.\d{3}-\d{2})$/'],
+            'email' => ['nullable', 'email', 'max:255'],
         ], [
             'cpf.regex' => 'O CPF deve ter 11 digitos ou estar no formato 000.000.000-00.',
+            'email.email' => 'O e-mail deve ter um formato válido.',
         ]);
 
         $course->students()->create([
             'name' => $validated['name'],
             'cpf' => $this->normalizeCpf($validated['cpf']),
+            'email' => $validated['email'] ?? null,
+            'status' => \App\Models\Student::STATUS_INSCRITO,
         ]);
 
         return redirect()
             ->route('courses.show', $course)
             ->with('success', 'Aluno adicionado ao curso com sucesso.');
+    }
+
+    public function showStudent(Course $course, Student $student)
+    {
+        abort_unless($student->course_id === $course->id, 404);
+
+        return view('courses.show-student', [
+            'course' => $course,
+            'student' => $student,
+        ]);
     }
 
     public function editStudent(Course $course, Student $student)
@@ -156,14 +182,22 @@ class CourseController extends Controller
 
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'cpf' => ['required', 'string', 'regex:/^(\d{11}|\d{3}\.\d{3}\.\d{3}-\d{2})$/'],
+            'cpf'       => ['required', 'string', 'regex:/^(\d{11}|\d{3}\.\d{3}\.\d{3}-\d{2})$/'],
+            'email'     => ['nullable', 'email', 'max:255'],
+            'frequency' => ['nullable', 'numeric', 'min:0', 'max:100'],
+            'grade'     => ['nullable', 'numeric', 'min:0', 'max:10'],
+            'status'    => ['nullable', 'in:pre-inscrito,inscrito,confirmado,certificado_emitido'],
         ], [
             'cpf.regex' => 'O CPF deve ter 11 digitos ou estar no formato 000.000.000-00.',
         ]);
 
         $student->update([
-            'name' => $validated['name'],
-            'cpf' => $this->normalizeCpf($validated['cpf']),
+            'name'      => $validated['name'],
+            'cpf'       => $this->normalizeCpf($validated['cpf']),
+            'email'     => $validated['email'] ?? $student->email,
+            'frequency' => $validated['frequency'] ?? $student->frequency,
+            'grade'     => $validated['grade'] ?? $student->grade,
+            'status'    => $validated['status'] ?? $student->status,
         ]);
 
         return redirect()

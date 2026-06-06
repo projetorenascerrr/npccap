@@ -9,7 +9,8 @@
         <div class="hero-card rounded-4 p-4 h-100">
             <p class="text-uppercase text-soft small mb-1">Curso</p>
             <h1 class="h3 mb-2">{{ $course->name }}</h1>
-            <p class="text-soft mb-4">Adicione os alunos vinculados a este curso para que eles apareçam no certificado.</p>
+            <p class="text-soft mb-4">Adicione os alunos vinculados a este curso para que eles apareçam no certificado.
+            </p>
 
             <form method="POST" action="{{ route('courses.students.store', $course) }}" class="row g-3">
                 @csrf
@@ -20,7 +21,8 @@
 
                 <div class="col-12">
                     <label for="cpf" class="form-label">CPF</label>
-                    <input id="cpf" name="cpf" class="form-control" value="{{ old('cpf') }}" placeholder="000.000.000-00" required>
+                    <input id="cpf" name="cpf" class="form-control" value="{{ old('cpf') }}"
+                        placeholder="000.000.000-00" required>
                 </div>
 
                 <div class="col-12 d-flex gap-2 flex-wrap">
@@ -43,7 +45,8 @@
 
             <form method="GET" action="{{ route('courses.show', $course) }}" class="row g-2 mb-3">
                 <div class="col-12 col-md-9">
-                    <input type="search" name="search" class="form-control" placeholder="Pesquisar aluno por nome ou CPF" value="{{ $search }}">
+                    <input type="search" name="search" class="form-control"
+                        placeholder="Pesquisar aluno por nome ou CPF" value="{{ $search }}">
                 </div>
                 <div class="col-12 col-md-3 d-flex gap-2">
                     <button type="submit" class="btn btn-outline-light w-100">Pesquisar</button>
@@ -68,13 +71,17 @@
                             <td>{{ $student->name }}</td>
                             <td>{{ $student->cpf }}</td>
                             <td class="text-end">
-                                <a class="btn btn-sm btn-outline-warning" href="{{ route('courses.students.edit', [$course, $student]) }}">Editar</a>
+                                <a class="btn btn-sm btn-outline-info"
+                                    href="{{ route('courses.students.show', [$course, $student]) }}">Visualizar</a>
+                                <a class="btn btn-sm btn-outline-warning"
+                                    href="{{ route('courses.students.edit', [$course, $student]) }}">Editar</a>
                             </td>
                         </tr>
                         @empty
                         <tr>
                             <td colspan="3" class="text-center text-soft py-4">
-                                {{ $search !== '' ? 'Nenhum aluno encontrado para a pesquisa.' : 'Nenhum aluno cadastrado ainda.' }}
+                                {{ $search !== '' ? 'Nenhum aluno encontrado para a pesquisa.' : 'Nenhum aluno
+                                cadastrado ainda.' }}
                             </td>
                         </tr>
                         @endforelse

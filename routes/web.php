@@ -9,6 +9,8 @@ Route::get('/', [CertificateController::class, 'index'])->name('certificates.ind
 Route::get('/certificates/show', [CertificateController::class, 'show'])->name('certificates.show');
 Route::post('/certificates', [CertificateController::class, 'store'])->name('certificates.store');
 Route::get('/certificates/{certificate}/pdf', [CertificateController::class, 'pdf'])->name('certificates.pdf');
+Route::post('/certificates/{certificate}/reissue', [CertificateController::class, 'reissue'])->name('certificates.reissue');
+Route::get('/validar/{code}', [CertificateController::class, 'validateCertificate'])->name('certificates.validate');
 
 Route::get('/courses', [CourseController::class, 'index'])->name('courses.index');
 Route::get('/courses/create', [CourseController::class, 'create'])->name('courses.create');
@@ -17,6 +19,7 @@ Route::get('/courses/{course}/edit', [CourseController::class, 'edit'])->name('c
 Route::put('/courses/{course}', [CourseController::class, 'update'])->name('courses.update');
 Route::get('/courses/{course}', [CourseController::class, 'show'])->name('courses.show');
 Route::post('/courses/{course}/students', [CourseController::class, 'storeStudent'])->name('courses.students.store');
+Route::get('/courses/{course}/students/{student}', [CourseController::class, 'showStudent'])->name('courses.students.show');
 Route::get('/courses/{course}/students/{student}/edit', [CourseController::class, 'editStudent'])->name('courses.students.edit');
 Route::put('/courses/{course}/students/{student}', [CourseController::class, 'updateStudent'])->name('courses.students.update');
 
