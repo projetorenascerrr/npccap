@@ -9,15 +9,27 @@ use Illuminate\Support\Facades\Storage;
 
 class CourseController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+        $search = trim((string) $request->query('search', ''));
+
         $courses = Course::withCount('students')
             ->with('students')
+            ->when($search !== '', function ($query) use ($search) {
+                $query->where(function ($innerQuery) use ($search) {
+                    $innerQuery->where('name', 'like', "%{$search}%")
+                        ->orWhereHas('students', function ($studentsQuery) use ($search) {
+                            $studentsQuery->where('name', 'like', "%{$search}%")
+                                ->orWhere('cpf', 'like', "%{$search}%");
+                        });
+                });
+            })
             ->orderBy('name')
             ->get();
 
         return view('courses.index', [
             'courses' => $courses,
+            'search' => $search,
         ]);
     }
 
@@ -87,12 +99,25 @@ class CourseController extends Controller
             ->with('success', 'Curso atualizado com sucesso.');
     }
 
-    public function show(Course $course)
+    public function show(Request $request, Course $course)
     {
+        $search = trim((string) $request->query('search', ''));
+
         $course->load('students');
+
+        $students = $course->students
+            ->when($search !== '', function ($collection) use ($search) {
+                return $collection->filter(function ($student) use ($search) {
+                    return str_contains(strtolower($student->name), strtolower($search))
+                        || str_contains(strtolower($student->cpf), strtolower($search));
+                });
+            })
+            ->values();
 
         return view('courses.show', [
             'course' => $course,
+            'students' => $students,
+            'search' => $search,
         ]);
     }
 

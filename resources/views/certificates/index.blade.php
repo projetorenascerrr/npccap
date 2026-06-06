@@ -42,8 +42,7 @@
 
                 <div class="col-12 col-md-2">
                     <label for="issue_date" class="form-label">Data</label>
-                    <input id="issue_date" name="issue_date" type="date" class="form-control"
-                        value="{{ old('issue_date', date('Y-m-d')) }}" required>
+                    <input id="issue_date" name="issue_date" type="date" class="form-control" value="{{ old('issue_date', date('Y-m-d')) }}" required>
                 </div>
 
                 <div class="col-12 d-flex gap-2 flex-wrap">
@@ -90,6 +89,18 @@
                 </div>
             </div>
 
+            <form method="GET" action="{{ route('certificates.index') }}" class="row g-2 mb-3">
+                <div class="col-12 col-md-9">
+                    <input type="search" name="search" class="form-control" placeholder="Pesquisar por curso, aluno, CPF ou ID" value="{{ $search }}">
+                </div>
+                <div class="col-12 col-md-3 d-flex gap-2">
+                    <button type="submit" class="btn btn-outline-light w-100">Pesquisar</button>
+                    @if ($search !== '')
+                    <a href="{{ route('certificates.index') }}" class="btn btn-outline-secondary">Limpar</a>
+                    @endif
+                </div>
+            </form>
+
             <div class="table-responsive">
                 <table class="table table-dark table-hover align-middle mb-0">
                     <thead>
@@ -111,13 +122,14 @@
                             <td>{{ $certificate->cpf }}</td>
                             <td>{{ $certificate->issue_date->format('d/m/Y') }}</td>
                             <td class="text-end">
-                                <a class="btn btn-sm btn-outline-info"
-                                    href="{{ route('certificates.pdf', $certificate) }}" target="_blank">Gerar PDF</a>
+                                <a class="btn btn-sm btn-outline-info" href="{{ route('certificates.pdf', $certificate) }}" target="_blank">Gerar PDF</a>
                             </td>
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="6" class="text-center text-soft py-4">Nenhum certificado cadastrado ainda.</td>
+                            <td colspan="6" class="text-center text-soft py-4">
+                                {{ $search !== '' ? 'Nenhum certificado encontrado para a pesquisa.' : 'Nenhum certificado cadastrado ainda.' }}
+                            </td>
                         </tr>
                         @endforelse
                     </tbody>

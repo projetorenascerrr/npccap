@@ -19,6 +19,18 @@
 
     <div class="col-12 col-xl-8">
         <div class="panel-card rounded-4 p-4">
+            <form method="GET" action="{{ route('courses.index') }}" class="row g-2 mb-3">
+                <div class="col-12 col-md-9">
+                    <input type="search" name="search" class="form-control" placeholder="Pesquisar por curso, aluno ou CPF" value="{{ $search }}">
+                </div>
+                <div class="col-12 col-md-3 d-flex gap-2">
+                    <button type="submit" class="btn btn-outline-light w-100">Pesquisar</button>
+                    @if ($search !== '')
+                    <a href="{{ route('courses.index') }}" class="btn btn-outline-secondary">Limpar</a>
+                    @endif
+                </div>
+            </form>
+
             <div class="table-responsive">
                 <table class="table table-dark table-hover align-middle mb-0">
                     <thead>
@@ -40,7 +52,9 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="3" class="text-center text-soft py-4">Nenhum curso cadastrado ainda.</td>
+                            <td colspan="3" class="text-center text-soft py-4">
+                                {{ $search !== '' ? 'Nenhum curso encontrado para a pesquisa.' : 'Nenhum curso cadastrado ainda.' }}
+                            </td>
                         </tr>
                         @endforelse
                     </tbody>

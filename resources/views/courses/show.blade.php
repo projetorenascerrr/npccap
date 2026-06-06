@@ -38,8 +38,20 @@
                     <p class="text-uppercase text-soft small mb-1">Alunos</p>
                     <h2 class="h5 mb-0">Alunos do curso</h2>
                 </div>
-                <span class="badge text-bg-primary">{{ $course->students->count() }} alunos</span>
+                <span class="badge text-bg-primary">{{ $students->count() }} alunos</span>
             </div>
+
+            <form method="GET" action="{{ route('courses.show', $course) }}" class="row g-2 mb-3">
+                <div class="col-12 col-md-9">
+                    <input type="search" name="search" class="form-control" placeholder="Pesquisar aluno por nome ou CPF" value="{{ $search }}">
+                </div>
+                <div class="col-12 col-md-3 d-flex gap-2">
+                    <button type="submit" class="btn btn-outline-light w-100">Pesquisar</button>
+                    @if ($search !== '')
+                    <a href="{{ route('courses.show', $course) }}" class="btn btn-outline-secondary">Limpar</a>
+                    @endif
+                </div>
+            </form>
 
             <div class="table-responsive">
                 <table class="table table-dark table-hover align-middle mb-0">
@@ -51,7 +63,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @forelse ($course->students as $student)
+                        @forelse ($students as $student)
                         <tr>
                             <td>{{ $student->name }}</td>
                             <td>{{ $student->cpf }}</td>
@@ -61,7 +73,9 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="3" class="text-center text-soft py-4">Nenhum aluno cadastrado ainda.</td>
+                            <td colspan="3" class="text-center text-soft py-4">
+                                {{ $search !== '' ? 'Nenhum aluno encontrado para a pesquisa.' : 'Nenhum aluno cadastrado ainda.' }}
+                            </td>
                         </tr>
                         @endforelse
                     </tbody>

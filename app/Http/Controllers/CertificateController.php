@@ -11,9 +11,19 @@ use Illuminate\Http\Request;
 
 class CertificateController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+        $search = trim((string) $request->query('search', ''));
+
         $certificates = Certificate::with(['course', 'student'])
+            ->when($search !== '', function ($query) use ($search) {
+                $query->where(function ($innerQuery) use ($search) {
+                    $innerQuery->where('course_name', 'like', "%{$search}%")
+                        ->orWhere('student_name', 'like', "%{$search}%")
+                        ->orWhere('cpf', 'like', "%{$search}%")
+                        ->orWhere('id', 'like', "%{$search}%");
+                });
+            })
             ->latest()
             ->get();
 
@@ -42,6 +52,7 @@ class CertificateController extends Controller
             'courses' => $courses,
             'coursesForJs' => $coursesForJs,
             'signature' => $signature,
+            'search' => $search,
         ]);
     }
 
@@ -87,6 +98,7 @@ class CertificateController extends Controller
             return [
                 'id' => $course->id,
                 'name' => $course->name,
+                'image_url' => $course->image_path ? asset('storage/' . $course->image_path) : null,
                 'students' => $course->students->map(function (Student $student) {
                     return [
                         'id' => $student->id,
@@ -108,9 +120,22 @@ class CertificateController extends Controller
     {
         $signature = Signature::query()->first();
 
+        $certificate->loadMissing('course');
+
+        $backgroundPath = null;
+        if ($certificate->course && $certificate->course->image_path) {
+            $path = storage_path('app/public/' . $certificate->course->image_path);
+            if (file_exists($path)) {
+                $type = pathinfo($path, PATHINFO_EXTENSION);
+                $data = file_get_contents($path);
+                $backgroundPath = 'data:image/' . $type . ';base64,' . base64_encode($data);
+            }
+        }
+
         $pdf = Pdf::loadView('certificates.pdf', [
             'certificate' => $certificate,
             'signature' => $signature,
+            'backgroundPath' => $backgroundPath,
         ])->setPaper('a4', 'landscape');
 
         return $pdf->stream('certificado-' . $certificate->id . '.pdf');
