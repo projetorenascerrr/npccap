@@ -14,12 +14,18 @@
             box-sizing: border-box;
         }
 
-        body {
+        body,
+        .certificate {
             margin: 0;
             padding: 0;
             width: 297mm;
             height: 210mm;
-            font-family: Georgia, "Times New Roman", serif;
+        }
+
+        body,
+        .certificate,
+        .certificate * {
+            font-family: "Baskerville Old Face", serif;
             color: #2c2a26;
         }
 
@@ -46,7 +52,6 @@
             left: 0;
             width: 297mm;
             height: 210mm;
-            background: rgba(254, 251, 243, 0.72);
             z-index: 1;
         }
 
@@ -57,18 +62,14 @@
             left: 0;
             width: 297mm;
             height: 210mm;
-            border: 5mm solid #b68a3d;
-            z-index: 2;
         }
 
         .inner {
             position: absolute;
-            top: 5mm;
+            top: 68mm;
             left: 5mm;
             right: 5mm;
             bottom: 5mm;
-            border: 1.2mm solid #d8b46e;
-            padding: 10mm 14mm 32mm;
             text-align: center;
         }
 
@@ -151,8 +152,7 @@
 
     <div class="certificate">
         <div class="inner">
-            <h1>CERTIFICADO</h1>
-            <p>A Secretaria de Estado da Justiça e da Cidadania por intermédio do Núcleo Pedagógico de Capacitação Continuada, confere a</p>
+            <p>A Secretaria de Estado da Justiça e da Cidadania por intermédio do Núcleo Pedagógico de Capacitação Continuada,<br>confere a</p>
             <div class="name">{{ $certificate->student_name }}</div>
             <p>CPF: {{ $certificate->cpf }}</p>
             <p>concluiu com aproveitamento o curso:</p>

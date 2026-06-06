@@ -12,7 +12,7 @@
                     <p class="text-uppercase text-soft small mb-1">Preview</p>
                     <h2 class="h5 mb-0">Assinaturas do certificado</h2>
                 </div>
-                <a class="btn btn-sm btn-outline-light" href="{{ route('signature.index') }}">Editar</a>
+                <a id="editCourseBtn" class="btn btn-sm btn-outline-light disabled" href="#" aria-disabled="true">Editar</a>
             </div>
 
             <div class="row g-3 mb-3">
@@ -86,6 +86,8 @@
     const previewIssueDate = document.getElementById('previewIssueDate');
     const previewBg = document.getElementById('previewBg');
     const previewOverlay = document.getElementById('previewOverlay');
+    const editCourseBtn = document.getElementById('editCourseBtn');
+    const editCourseUrlTemplate = @json(route('courses.edit', ['course' => '__COURSE_ID__']));
 
     function loadStudents(courseId) {
         const course = courses.find((item) => String(item.id) === String(courseId));
@@ -136,6 +138,16 @@
         } else {
             previewBg.style.backgroundImage = '';
             previewOverlay.classList.add('d-none');
+        }
+
+        if (selectedCourse && selectedCourse.id) {
+            editCourseBtn.href = editCourseUrlTemplate.replace('__COURSE_ID__', selectedCourse.id);
+            editCourseBtn.classList.remove('disabled');
+            editCourseBtn.removeAttribute('aria-disabled');
+        } else {
+            editCourseBtn.href = '#';
+            editCourseBtn.classList.add('disabled');
+            editCourseBtn.setAttribute('aria-disabled', 'true');
         }
 
         if (selectedStudentOption && selectedStudentOption.value) {

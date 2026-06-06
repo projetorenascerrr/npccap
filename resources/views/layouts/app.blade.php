@@ -51,39 +51,40 @@
                     </li>
                 </ul>
                 <hr>
-                <div class="dropdown">
-                    <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
-                        <img src="https://github.com/mdo.png" alt="mdo" width="32" height="32" class="rounded-circle me-2">
-                        <strong>mdo</strong>
-                    </a>
-                    <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownUser1">
-                        <li><a class="dropdown-item" href="#">New project...</a></li>
-                        <li><a class="dropdown-item" href="#">Settings</a></li>
-                        <li><a class="dropdown-item" href="#">Profile</a></li>
-                        <li>
-                            <hr class="dropdown-divider">
-                        </li>
-                        <li><a class="dropdown-item" href="#">Sign out</a></li>
-                    </ul>
-                </div>
             </div>
         </aside>
 
         <div class="flex-grow-1 d-flex flex-column">
             <header class="navbar navbar-expand-lg navbar-dark bg-dark border-bottom border-secondary sticky-top">
-                <div class="container-fluid px-3 px-lg-4">
+                <div class="container-fluid px-3 px-lg-4 py-2 py-lg-0">
                     <button class="btn btn-outline-light d-lg-none me-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#appSidebar" aria-controls="appSidebar">
                         <i class="bi bi-list"></i>
                     </button>
                     <div class="d-flex align-items-center gap-3">
-                        <img src="{{ asset('images/logo.svg') }}" alt="Logo NPCCAP" class="brand-logo d-none d-sm-block">
                         <div>
                             <span class="navbar-brand fw-semibold mb-0 d-block">@yield('page_title', 'NPCCAP')</span>
                             <span class="text-soft small d-none d-md-inline">Gerador de certificados A4 horizontal</span>
                         </div>
                     </div>
-                    <div class="ms-auto d-flex align-items-center gap-3">
+                    <div class="ms-auto d-flex align-items-center gap-2 gap-lg-3">
                         <span class="badge text-bg-primary-subtle text-primary-emphasis border border-primary-subtle d-none d-md-inline">Institucional</span>
+
+                        <div class="dropdown">
+                            <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle px-1 py-1" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
+                                <img src="https://github.com/mdo.png" alt="mdo" width="32" height="32" class="rounded-circle me-0 me-sm-2">
+                                <strong class="d-none d-sm-inline">Admin</strong>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end dropdown-menu-dark text-small shadow" aria-labelledby="dropdownUser1">
+                                <li><a class="dropdown-item" href="#">Novo certificado...</a></li>
+                                <li><a class="dropdown-item" href="#">Configurações</a></li>
+                                <li><a class="dropdown-item" href="#">Perfil</a></li>
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+                                <li><a class="dropdown-item" href="#">Sair</a></li>
+                            </ul>
+                        </div>
+
                     </div>
                 </div>
             </header>
