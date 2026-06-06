@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Course;
 use App\Models\Certificate;
+use App\Models\Signature;
 use App\Models\Student;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
@@ -15,6 +16,8 @@ class CertificateController extends Controller
         $certificates = Certificate::with(['course', 'student'])
             ->latest()
             ->get();
+
+        $signature = Signature::query()->first();
 
         $courses = Course::with('students')
             ->orderBy('name')
@@ -38,6 +41,7 @@ class CertificateController extends Controller
             'certificates' => $certificates,
             'courses' => $courses,
             'coursesForJs' => $coursesForJs,
+            'signature' => $signature,
         ]);
     }
 
@@ -71,10 +75,42 @@ class CertificateController extends Controller
             ->with('success', 'Certificado cadastrado com sucesso.');
     }
 
+    public function show()
+    {
+        $signature = Signature::query()->first();
+
+        $courses = Course::with('students')
+            ->orderBy('name')
+            ->get();
+
+        $coursesForJs = $courses->map(function (Course $course) {
+            return [
+                'id' => $course->id,
+                'name' => $course->name,
+                'students' => $course->students->map(function (Student $student) {
+                    return [
+                        'id' => $student->id,
+                        'name' => $student->name,
+                        'cpf' => $student->cpf,
+                    ];
+                })->values(),
+            ];
+        })->values();
+
+        return view('certificates.show', [
+            'signature' => $signature,
+            'courses' => $courses,
+            'coursesForJs' => $coursesForJs,
+        ]);
+    }
+
     public function pdf(Certificate $certificate)
     {
+        $signature = Signature::query()->first();
+
         $pdf = Pdf::loadView('certificates.pdf', [
             'certificate' => $certificate,
+            'signature' => $signature,
         ])->setPaper('a4', 'landscape');
 
         return $pdf->stream('certificado-' . $certificate->id . '.pdf');

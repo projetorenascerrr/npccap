@@ -1,18 +1,22 @@
 <svg width="256" height="256" viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <rect width="256" height="256" rx="56" fill="#0F172A" />
-    <circle cx="128" cy="118" r="62" fill="url(#paint0_linear_1_2)" />
-    <path d="M83 152C83 152 104 176 128 176C152 176 173 152 173 152" stroke="#E2E8F0"
-        stroke-width="10" stroke-linecap="round" />
-    <path d="M94 96C103 83 114 76 128 76C142 76 153 83 162 96" stroke="#E2E8F0" stroke-width="10"
-        stroke-linecap="round" />
-    <path d="M103 122H153" stroke="#E2E8F0" stroke-width="10" stroke-linecap="round" />
-    <path d="M128 94V142" stroke="#E2E8F0" stroke-width="10" stroke-linecap="round" />
-    <path d="M72 188H184" stroke="#38BDF8" stroke-width="10" stroke-linecap="round" />
+    <rect width="256" height="256" rx="56" fill="#0B1F3A" />
+
+    <rect x="56" y="44" width="144" height="168" rx="16" fill="#F8FAFC" />
+    <rect x="68" y="60" width="120" height="18" rx="9" fill="#DCE8FF" />
+
+    <path d="M80 98H160" stroke="#94A3B8" stroke-width="8" stroke-linecap="round" />
+    <path d="M80 116H146" stroke="#94A3B8" stroke-width="8" stroke-linecap="round" />
+    <path d="M80 134H136" stroke="#94A3B8" stroke-width="8" stroke-linecap="round" />
+
+    <circle cx="165" cy="158" r="28" fill="url(#sealGradient)" />
+    <path d="M153 158L162 167L178 151" stroke="#F8FAFC" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" />
+
+    <path d="M150 184L141 212L165 198L189 212L180 184" fill="#F59E0B" />
+
     <defs>
-        <linearGradient id="paint0_linear_1_2" x1="76" y1="56" x2="188" y2="180"
-            gradientUnits="userSpaceOnUse">
+        <linearGradient id="sealGradient" x1="137" y1="130" x2="193" y2="186" gradientUnits="userSpaceOnUse">
             <stop stop-color="#2563EB" />
-            <stop offset="1" stop-color="#7C3AED" />
+            <stop offset="1" stop-color="#1D4ED8" />
         </linearGradient>
     </defs>
 </svg>

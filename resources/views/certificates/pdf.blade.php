@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <title>Certificado</title>
@@ -73,23 +74,32 @@
             font-size: 4.5mm;
         }
 
-        .signature {
+        .signatures {
             position: absolute;
             left: 0;
             right: 0;
             bottom: 16mm;
-            text-align: center;
+            padding: 0 20mm;
             font-size: 4.2mm;
+            white-space: pre-line;
+            display: table;
+            width: calc(100% - 40mm);
+        }
+
+        .signature-box {
+            display: table-cell;
+            width: 50%;
+            text-align: center;
         }
 
         .line {
-            width: 70mm;
+            width: 80mm;
             margin: 0 auto 2mm;
             border-top: 0.4mm solid #2c2a26;
         }
-
     </style>
 </head>
+
 <body>
     <div class="certificate">
         <div class="inner">
@@ -107,10 +117,17 @@
             </div>
         </div>
 
-        <div class="signature">
-            <div class="line"></div>
-            Coordenacao NPCCAP
+        <div class="signatures">
+            <div class="signature-box">
+                <div class="line"></div>
+                {!! nl2br(e($signature?->ass1 ?: 'Ass1')) !!}
+            </div>
+            <div class="signature-box">
+                <div class="line"></div>
+                {!! nl2br(e($signature?->ass2 ?: 'Ass2')) !!}
+            </div>
         </div>
     </div>
 </body>
+
 </html>

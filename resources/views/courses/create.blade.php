@@ -5,17 +5,49 @@
 
 @section('content')
 <div class="row justify-content-center">
-    <div class="col-12 col-xl-7">
+    <div class="col-12 col-xl-10">
         <div class="hero-card rounded-4 p-4 p-lg-5">
             <p class="text-uppercase text-soft small mb-1">Cadastro</p>
             <h1 class="h3 mb-2">Criar novo curso</h1>
             <p class="text-soft mb-4">Depois de salvar o curso, você poderá adicionar os alunos dele.</p>
 
-            <form method="POST" action="{{ route('courses.store') }}" class="row g-3">
+            <form method="POST" action="{{ route('courses.store') }}" enctype="multipart/form-data" class="row g-4">
                 @csrf
-                <div class="col-12">
-                    <label for="name" class="form-label">Nome do curso</label>
-                    <input id="name" name="name" class="form-control" value="{{ old('name') }}" required>
+
+                <div class="col-12 col-lg-6">
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label for="image" class="form-label">Upload de Imagem</label>
+                            <input id="image" name="image" type="file" accept="image/*" class="form-control">
+                        </div>
+
+                        <div class="col-12">
+                            <label for="name" class="form-label">Nome do curso</label>
+                            <input id="name" name="name" class="form-control" value="{{ old('name') }}" required>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12 col-lg-6">
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label for="description" class="form-label">Descricao do Curso</label>
+                            <textarea id="description" name="description" class="form-control"
+                                rows="4">{{ old('description') }}</textarea>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="hours" class="form-label">Horas</label>
+                            <input id="hours" name="hours" type="number" min="1" class="form-control"
+                                value="{{ old('hours') }}">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="course_date" class="form-label">Data</label>
+                            <input id="course_date" name="course_date" type="date" class="form-control"
+                                value="{{ old('course_date') }}">
+                        </div>
+                    </div>
                 </div>
 
                 <div class="col-12 d-flex gap-2 flex-wrap">

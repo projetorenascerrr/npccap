@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Course;
 use App\Models\Student;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class CourseController extends Controller
 {
@@ -29,7 +30,19 @@ class CourseController extends Controller
     {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
+            'description' => ['nullable', 'string'],
+            'hours' => ['nullable', 'integer', 'min:1'],
+            'course_date' => ['nullable', 'date'],
+            'ass1' => ['nullable', 'string', 'max:255'],
+            'ass2' => ['nullable', 'string', 'max:255'],
+            'image' => ['nullable', 'image', 'max:5120'],
         ]);
+
+        if ($request->hasFile('image')) {
+            $validated['image_path'] = $request->file('image')->store('courses', 'public');
+        }
+
+        unset($validated['image']);
 
         $course = Course::create($validated);
 
@@ -49,13 +62,29 @@ class CourseController extends Controller
     {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
+            'description' => ['nullable', 'string'],
+            'hours' => ['nullable', 'integer', 'min:1'],
+            'course_date' => ['nullable', 'date'],
+            'ass1' => ['nullable', 'string', 'max:255'],
+            'ass2' => ['nullable', 'string', 'max:255'],
+            'image' => ['nullable', 'image', 'max:5120'],
         ]);
+
+        if ($request->hasFile('image')) {
+            if ($course->image_path) {
+                Storage::disk('public')->delete($course->image_path);
+            }
+
+            $validated['image_path'] = $request->file('image')->store('courses', 'public');
+        }
+
+        unset($validated['image']);
 
         $course->update($validated);
 
         return redirect()
             ->route('courses.index')
-            ->with('success', 'Nome do curso atualizado com sucesso.');
+            ->with('success', 'Curso atualizado com sucesso.');
     }
 
     public function show(Course $course)

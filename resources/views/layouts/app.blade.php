@@ -5,7 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'NPCCAP')</title>
+    <link rel="shortcut icon" href="{{ asset('favicon.ico') }}" type="image/x-icon">
+    <link rel="icon" href="{{ asset('favicon.ico') }}" type="image/x-icon">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <script src="https://kit.fontawesome.com/a81368914c.js" crossorigin="anonymous"></script>
 </head>
 <body>
     <div class="app-shell d-flex flex-column flex-lg-row min-vh-100">
@@ -17,7 +20,7 @@
             <div class="offcanvas-body d-flex flex-column flex-shrink-0 p-3 text-white bg-dark sidebar-frame">
                 <a href="{{ route('certificates.index') }}" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none">
                     <img src="{{ asset('images/logo.svg') }}" alt="Logo NPCCAP" class="brand-logo me-2">
-                    <span class="fs-4">Sidebar</span>
+                    <span class="fs-4">NPCCAP</span>
                 </a>
                 <hr>
                 <ul class="nav nav-pills flex-column mb-auto gap-2">
@@ -28,27 +31,22 @@
                         </a>
                     </li>
                     <li>
-                        <a href="{{ route('courses.index') }}" class="nav-link {{ request()->routeIs('courses.index') ? 'active' : 'text-white' }}">
+                        <a href="{{ route('courses.index') }}" class="nav-link {{ request()->routeIs('courses.*') ? 'active' : 'text-white' }}">
                             <i class="bi bi-mortarboard"></i>
                             Cursos
                         </a>
                     </li>
                     <li>
-                        <a href="{{ route('courses.create') }}" class="nav-link {{ request()->routeIs('courses.create') ? 'active' : 'text-white' }}">
-                            <i class="bi bi-table nav-icon"></i>
-                            Orders
+                        <a href="{{ route('signature.index') }}" class="nav-link {{ request()->routeIs('signature.*') ? 'active' : 'text-white' }}">
+                            <i class="fa-solid fa-signature"></i>
+                            <i class="bi bi-pen"></i>
+                            Assinaturas
                         </a>
                     </li>
                     <li>
-                        <a href="{{ route('courses.index') }}" class="nav-link text-white">
-                            <i class="bi bi-grid nav-icon"></i>
-                            Products
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ route('courses.index') }}" class="nav-link text-white">
-                            <i class="bi bi-people-circle nav-icon"></i>
-                            Customers
+                        <a href="{{ route('certificates.show') }}" class="nav-link {{ request()->routeIs('certificates.*') ? 'active' : 'text-white' }}">
+                            <i class="bi bi-patch-check"></i>
+                            Certificados
                         </a>
                     </li>
                 </ul>
