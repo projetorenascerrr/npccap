@@ -54,28 +54,12 @@ class Student extends Model
             return false;
         }
 
-        // RN007 – Frequência mínima
-        if ($this->frequency === null || (float) $this->frequency < (float) $course->minimum_frequency) {
-            return false;
-        }
-
-        // RN009 – Nota mínima (apenas quando curso exige avaliação)
-        if ($course->minimum_grade !== null) {
-            if ($this->grade === null || (float) $this->grade < (float) $course->minimum_grade) {
-                return false;
-            }
-        }
-
         return true;
     }
 
     // RN011 – Elegibilidade para emissão de certificado
     public function canIssueCertificate(): bool
     {
-        $course = $this->relationLoaded('course') ? $this->course : $this->course()->first();
-
-        return $this->isApproved()
-            && $course?->status === Course::STATUS_ENCERRADO
-            && $this->status !== self::STATUS_PRE_INSCRITO;
+        return $this->isApproved();
     }
 }

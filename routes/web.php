@@ -3,6 +3,7 @@
 use App\Http\Controllers\CertificateController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\SignatureController;
+use App\Http\Controllers\StudentController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [CertificateController::class, 'index'])->name('certificates.index');
@@ -17,6 +18,7 @@ Route::get('/courses/create', [CourseController::class, 'create'])->name('course
 Route::post('/courses', [CourseController::class, 'store'])->name('courses.store');
 Route::get('/courses/{course}/edit', [CourseController::class, 'edit'])->name('courses.edit');
 Route::put('/courses/{course}', [CourseController::class, 'update'])->name('courses.update');
+Route::post('/courses/{course}/close', [CourseController::class, 'close'])->name('courses.close');
 Route::get('/courses/{course}', [CourseController::class, 'show'])->name('courses.show');
 Route::post('/courses/{course}/students', [CourseController::class, 'storeStudent'])->name('courses.students.store');
 Route::get('/courses/{course}/students/{student}', [CourseController::class, 'showStudent'])->name('courses.students.show');
@@ -25,3 +27,5 @@ Route::put('/courses/{course}/students/{student}', [CourseController::class, 'up
 
 Route::get('/signature', [SignatureController::class, 'index'])->name('signature.index');
 Route::post('/signature', [SignatureController::class, 'store'])->name('signature.store');
+
+Route::get('/students', [StudentController::class, 'index'])->name('students.index');

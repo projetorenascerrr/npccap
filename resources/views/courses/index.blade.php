@@ -21,7 +21,8 @@
         <div class="panel-card rounded-4 p-4">
             <form method="GET" action="{{ route('courses.index') }}" class="row g-2 mb-3">
                 <div class="col-12 col-md-9">
-                    <input type="search" name="search" class="form-control" placeholder="Pesquisar por curso, aluno ou CPF" value="{{ $search }}">
+                    <input type="search" name="search" class="form-control"
+                        placeholder="Pesquisar por curso, aluno ou CPF" value="{{ $search }}">
                 </div>
                 <div class="col-12 col-md-3 d-flex gap-2">
                     <button type="submit" class="btn btn-outline-light w-100">Pesquisar</button>
@@ -43,17 +44,32 @@
                     <tbody>
                         @forelse ($courses as $course)
                         <tr>
-                            <td>{{ $course->name }}</td>
+                            <td>
+                                {{ $course->name }}
+                                @if (($course->status ?? 'ativo') === 'encerrado')
+                                <span class="badge text-bg-danger ms-2">Encerrado</span>
+                                @endif
+                            </td>
                             <td>{{ $course->students_count }}</td>
                             <td class="text-end">
-                                <a class="btn btn-sm btn-outline-info" href="{{ route('courses.show', $course) }}">Abrir</a>
-                                <a class="btn btn-sm btn-outline-warning" href="{{ route('courses.edit', $course) }}">Editar</a>
+                                <a class="btn btn-sm btn-outline-info"
+                                    href="{{ route('courses.show', $course) }}">Abrir</a>
+                                <a class="btn btn-sm btn-outline-warning"
+                                    href="{{ route('courses.edit', $course) }}">Editar</a>
+                                @if (($course->status ?? 'ativo') !== 'encerrado')
+                                <form method="POST" action="{{ route('courses.close', $course) }}" class="d-inline"
+                                    onsubmit="return confirm('Deseja realmente encerrar este curso?');">
+                                    @csrf
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">Encerrar</button>
+                                </form>
+                                @endif
                             </td>
                         </tr>
                         @empty
                         <tr>
                             <td colspan="3" class="text-center text-soft py-4">
-                                {{ $search !== '' ? 'Nenhum curso encontrado para a pesquisa.' : 'Nenhum curso cadastrado ainda.' }}
+                                {{ $search !== '' ? 'Nenhum curso encontrado para a pesquisa.' : 'Nenhum curso
+                                cadastrado ainda.' }}
                             </td>
                         </tr>
                         @endforelse

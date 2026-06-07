@@ -133,12 +133,33 @@ class CourseController extends Controller
         ]);
     }
 
+    public function close(Course $course)
+    {
+        if ($course->status === Course::STATUS_ENCERRADO) {
+            return redirect()
+                ->route('courses.edit', $course)
+                ->with('success', 'Este curso ja esta encerrado.');
+        }
+
+        $course->update([
+            'status' => Course::STATUS_ENCERRADO,
+            'end_date' => $course->end_date ?? now()->toDateString(),
+        ]);
+
+        return redirect()
+            ->route('courses.edit', $course)
+            ->with('success', 'Curso encerrado com sucesso.');
+    }
+
     public function storeStudent(Request $request, Course $course)
     {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'cpf'   => ['required', 'string', 'regex:/^(\d{11}|\d{3}\.\d{3}\.\d{3}-\d{2})$/'],
             'email' => ['nullable', 'email', 'max:255'],
+            'frequency' => ['nullable', 'numeric', 'min:0', 'max:100'],
+            'grade'     => ['nullable', 'numeric', 'min:0', 'max:10'],
+            'status'    => ['nullable', 'in:pre-inscrito,inscrito,confirmado,certificado_emitido'],
         ], [
             'cpf.regex' => 'O CPF deve ter 11 digitos ou estar no formato 000.000.000-00.',
             'email.email' => 'O e-mail deve ter um formato válido.',
@@ -148,7 +169,9 @@ class CourseController extends Controller
             'name' => $validated['name'],
             'cpf' => $this->normalizeCpf($validated['cpf']),
             'email' => $validated['email'] ?? null,
-            'status' => \App\Models\Student::STATUS_INSCRITO,
+            'frequency' => $validated['frequency'] ?? null,
+            'grade' => $validated['grade'] ?? null,
+            'status' => $validated['status'] ?? \App\Models\Student::STATUS_INSCRITO,
         ]);
 
         return redirect()

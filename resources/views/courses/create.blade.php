@@ -47,6 +47,18 @@
                             <input id="course_date" name="course_date" type="date" class="form-control"
                                 value="{{ old('course_date') }}">
                         </div>
+
+                        <div class="col-md-6">
+                            <label for="minimum_frequency" class="form-label">Frequencia minima (%)</label>
+                            <input id="minimum_frequency" name="minimum_frequency" type="number" min="0" max="100"
+                                step="0.01" class="form-control" value="{{ old('minimum_frequency', 75) }}">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="minimum_grade" class="form-label">Nota minima</label>
+                            <input id="minimum_grade" name="minimum_grade" type="number" min="0" max="10" step="0.01"
+                                class="form-control" value="{{ old('minimum_grade') }}" placeholder="Opcional">
+                        </div>
                     </div>
                 </div>
 

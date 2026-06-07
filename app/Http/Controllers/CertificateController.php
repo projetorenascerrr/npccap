@@ -77,11 +77,6 @@ class CertificateController extends Controller
 
         $course = Course::findOrFail($validated['course_id']);
 
-        // RN006 – Certificados só podem ser emitidos para eventos encerrados
-        if (! $course->isEncerrado()) {
-            return back()->withErrors(['course_id' => 'Certificados só podem ser emitidos para cursos encerrados.'])->withInput();
-        }
-
         $student = Student::whereKey($validated['student_id'])
             ->where('course_id', $course->id)
             ->with('course')
@@ -90,7 +85,7 @@ class CertificateController extends Controller
         // RN011 – Elegibilidade
         if (! $student->canIssueCertificate()) {
             $reason = ! $student->isApproved()
-                ? 'O aluno não atingiu os critérios mínimos de frequência/nota.'
+                ? 'O aluno não está apto para emissão no momento.'
                 : 'O cadastro do aluno está incompleto ou o aluno é pré-inscrito.';
 
             return back()->withErrors(['student_id' => $reason])->withInput();

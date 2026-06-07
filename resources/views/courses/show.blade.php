@@ -25,6 +25,35 @@
                         placeholder="000.000.000-00" required>
                 </div>
 
+                <div class="col-12">
+                    <label for="email" class="form-label">E-mail</label>
+                    <input id="email" name="email" type="email" class="form-control" value="{{ old('email') }}"
+                        placeholder="aluno@exemplo.com">
+                </div>
+
+                <div class="col-12 col-md-4">
+                    <label for="frequency" class="form-label">Frequencia (%)</label>
+                    <input id="frequency" name="frequency" type="number" min="0" max="100" step="0.01"
+                        class="form-control" value="{{ old('frequency') }}" placeholder="75">
+                </div>
+
+                <div class="col-12 col-md-4">
+                    <label for="grade" class="form-label">Nota</label>
+                    <input id="grade" name="grade" type="number" min="0" max="10" step="0.01" class="form-control"
+                        value="{{ old('grade') }}" placeholder="7.0">
+                </div>
+
+                <div class="col-12 col-md-4">
+                    <label for="status" class="form-label">Status</label>
+                    <select id="status" name="status" class="form-select">
+                        <option value="inscrito" @selected(old('status')==='inscrito' )>Inscrito</option>
+                        <option value="pre-inscrito" @selected(old('status')==='pre-inscrito' )>Pre-inscrito</option>
+                        <option value="confirmado" @selected(old('status')==='confirmado' )>Confirmado</option>
+                        <option value="certificado_emitido" @selected(old('status')==='certificado_emitido' )>
+                            Certificado Emitido</option>
+                    </select>
+                </div>
+
                 <div class="col-12 d-flex gap-2 flex-wrap">
                     <button type="submit" class="btn btn-brand text-white">Adicionar aluno</button>
                     <a href="{{ route('courses.index') }}" class="btn btn-outline-light">Voltar</a>
