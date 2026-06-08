@@ -5,7 +5,7 @@
 
 @section('content')
 <div class="row g-4">
-    <div class="col-12 col-xl-4">
+    <div class="col-12 col-xl-3">
         <div class="hero-card rounded-4 p-4 h-100">
             <p class="text-uppercase text-soft small mb-1">Gestão</p>
             <h1 class="h3 mb-2">Cursos cadastrados</h1>
@@ -17,7 +17,7 @@
         </div>
     </div>
 
-    <div class="col-12 col-xl-8">
+    <div class="col-12 col-xl-9">
         <div class="panel-card rounded-4 p-4">
             <form method="GET" action="{{ route('courses.index') }}" class="row g-2 mb-3">
                 <div class="col-12 col-md-9">
@@ -44,7 +44,7 @@
                     <tbody>
                         @forelse ($courses as $course)
                         <tr>
-                            <td>
+                            <td class="text-uppercase">
                                 {{ $course->name }}
                                 @if (($course->status ?? 'ativo') === 'encerrado')
                                 <span class="badge text-bg-danger ms-2">Encerrado</span>

@@ -45,6 +45,12 @@ class Student extends Model
         return $this->hasMany(Certificate::class);
     }
 
+    // Accessor para obter o primeiro certificado
+    public function getCertificateAttribute()
+    {
+        return $this->certificates()->first();
+    }
+
     // RN010 – Aprovação automática
     public function isApproved(): bool
     {

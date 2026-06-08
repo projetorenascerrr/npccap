@@ -91,6 +91,7 @@
                         <tr>
                             <th>Aluno</th>
                             <th>CPF</th>
+                            <th>EMIÇÃO</th>
                             <th class="text-end">Ações</th>
                         </tr>
                     </thead>
@@ -99,11 +100,21 @@
                         <tr>
                             <td>{{ $student->name }}</td>
                             <td>{{ $student->cpf }}</td>
+                            <td>
+                                @if ($student->certificate)
+                                    <span class="badge text-bg-success text-uppercase">Emitido</span>
+                                @else
+                                    <form method="POST" action="{{ route('certificates.store') }}">
+                                        @csrf
+                                        <input type="hidden" name="course_id" value="{{ $course->id }}">
+                                        <input type="hidden" name="student_id" value="{{ $student->id }}">
+                                        <input type="hidden" name="issue_date" value="{{ date('Y-m-d') }}">
+                                        <button type="submit" class="btn btn-brand text-white">Emitir Certificado</button>
+                                    </form>
+                                @endif
+                            </td>
                             <td class="text-end">
-                                <a class="btn btn-sm btn-outline-info"
-                                    href="{{ route('courses.students.show', [$course, $student]) }}">Visualizar</a>
-                                <a class="btn btn-sm btn-outline-warning"
-                                    href="{{ route('courses.students.edit', [$course, $student]) }}">Editar</a>
+                                <a class="btn btn-sm btn-outline-warning" href="{{ route('courses.students.edit', [$course, $student]) }}">Editar</a>
                             </td>
                         </tr>
                         @empty

@@ -123,6 +123,7 @@
                             <td>{{ $certificate->issue_date->format('d/m/Y') }}</td>
                             <td class="text-end">
                                 <a class="btn btn-sm btn-outline-info" href="{{ route('certificates.pdf', $certificate) }}" target="_blank">Gerar PDF</a>
+                                <a class="btn btn-sm btn-outline-success" href="{{ route('certificates.pdf', $certificate) }}" target="_blank">Compartilhar Link</a>
                             </td>
                         </tr>
                         @empty

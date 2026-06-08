@@ -115,7 +115,9 @@ class CourseController extends Controller
     {
         $search = trim((string) $request->query('search', ''));
 
-        $course->load('students');
+        $course->load(['students' => function ($query) {
+            $query->with('certificates');
+        }]);
 
         $students = $course->students
             ->when($search !== '', function ($collection) use ($search) {

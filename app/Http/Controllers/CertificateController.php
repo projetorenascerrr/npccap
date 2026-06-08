@@ -121,7 +121,7 @@ class CertificateController extends Controller
         $student->update(['status' => Student::STATUS_CERTIFICADO]);
 
         return redirect()
-            ->route('certificates.index')
+            ->route('courses.show', $course)
             ->with('success', 'Certificado emitido com sucesso. Código: ' . $validationCode);
     }
 
