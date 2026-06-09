@@ -54,6 +54,7 @@ class CourseController extends Controller
             'ass1'              => ['nullable', 'string', 'max:255'],
             'ass2'              => ['nullable', 'string', 'max:255'],
             'image'             => ['nullable', 'image', 'max:5120'],
+            'image_bg'          => ['nullable', 'image', 'max:5120'],
         ]);
 
         if ($request->hasFile('image')) {
@@ -61,6 +62,12 @@ class CourseController extends Controller
         }
 
         unset($validated['image']);
+
+        if ($request->hasFile('image_bg')) {
+            $validated['image_bg'] = $request->file('image_bg')->store('courses/backgrounds', 'public');
+        } else {
+            unset($validated['image_bg']);
+        }
 
         $course = Course::create($validated);
 
@@ -92,6 +99,7 @@ class CourseController extends Controller
             'ass1'              => ['nullable', 'string', 'max:255'],
             'ass2'              => ['nullable', 'string', 'max:255'],
             'image'             => ['nullable', 'image', 'max:5120'],
+            'image_bg'          => ['nullable', 'image', 'max:5120'],
         ]);
 
         if ($request->hasFile('image')) {
@@ -104,10 +112,20 @@ class CourseController extends Controller
 
         unset($validated['image']);
 
+        if ($request->hasFile('image_bg')) {
+            if ($course->image_bg) {
+                Storage::disk('public')->delete($course->image_bg);
+            }
+
+            $validated['image_bg'] = $request->file('image_bg')->store('courses/backgrounds', 'public');
+        } else {
+            unset($validated['image_bg']);
+        }
+
         $course->update($validated);
 
         return redirect()
-            ->route('courses.index')
+            ->route('courses.edit', $course)
             ->with('success', 'Curso atualizado com sucesso.');
     }
 

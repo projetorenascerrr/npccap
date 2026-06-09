@@ -2,11 +2,25 @@
 
 use App\Http\Controllers\CertificateController;
 use App\Http\Controllers\CourseController;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\SignatureController;
 use App\Http\Controllers\StudentController;
+use App\Models\Course;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', [CertificateController::class, 'index'])->name('certificates.index');
+Route::get('/', function () {
+    $courses = Course::query()
+        ->where('status', Course::STATUS_ATIVO)
+        ->orderBy('start_date')
+        ->orderBy('name')
+        ->get();
+
+    return view('welcome', [
+        'courses' => $courses,
+    ]);
+})->name('welcome');
+Route::get('/home', [HomeController::class, 'index'])->name('home');
+Route::get('/certificates', [CertificateController::class, 'index'])->name('certificates.index');
 Route::get('/certificates/show', [CertificateController::class, 'show'])->name('certificates.show');
 Route::post('/certificates', [CertificateController::class, 'store'])->name('certificates.store');
 Route::get('/certificates/{certificate}/pdf', [CertificateController::class, 'pdf'])->name('certificates.pdf');

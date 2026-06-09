@@ -10,9 +10,9 @@
             <p class="text-uppercase text-soft small mb-1">Gestão</p>
             <h1 class="h3 mb-2">Cursos cadastrados</h1>
             <p class="text-soft">Crie um novo curso e entre no cadastro dos alunos daquele curso.</p>
-            <div class="d-flex gap-2 flex-wrap">
-                <a class="btn btn-brand text-white" href="{{ route('courses.create') }}">Criar novo curso</a>
-                <a class="btn btn-outline-light" href="{{ route('certificates.index') }}">Certificados</a>
+            <div class="d-grid gap-2">
+                <a class="btn btn-brand text-white" href="{{ route('courses.create') }}"><i class="bi bi-plus-lg"></i> Criar novo curso</a>
+                <a class="btn block btn-outline-light" href="{{ route('certificates.index') }}">Certificados</a>
             </div>
         </div>
     </div>

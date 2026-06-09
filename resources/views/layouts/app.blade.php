@@ -31,8 +31,8 @@
                 <hr>
                 <ul class="nav nav-pills flex-column mb-auto gap-2">
                     <li class="nav-item">
-                        <a href="{{ route('certificates.index') }}"
-                            class="nav-link {{ request()->routeIs('certificates.*') ? 'active' : 'text-white' }}"
+                        <a href="{{ route('home') }}"
+                            class="nav-link {{ request()->routeIs('home') ? 'active' : 'text-white' }}"
                             aria-current="page">
                             <i class="bi bi-house nav-icon"></i>
                             Home
@@ -54,7 +54,7 @@
                         </a>
                     </li>
                     <li>
-                        <a href="{{ route('certificates.show') }}"
+                        <a href="{{ route('certificates.index') }}"
                             class="nav-link {{ request()->routeIs('certificates.*') ? 'active' : 'text-white' }}">
                             <i class="bi bi-patch-check"></i>
                             Certificados
@@ -82,8 +82,7 @@
                     <div class="d-flex align-items-center gap-3">
                         <div>
                             <span class="navbar-brand fw-semibold mb-0 d-block">@yield('page_title', 'NPCCAP')</span>
-                            <span class="text-soft small d-none d-md-inline">Gerador de certificados A4
-                                horizontal</span>
+                            <span class="text-soft small d-none d-md-inline">Núcleo Pedagógico de Capacitação Continuada</span>
                         </div>
                     </div>
                     <div class="ms-auto d-flex align-items-center gap-2 gap-lg-3">

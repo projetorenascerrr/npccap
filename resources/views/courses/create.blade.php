@@ -17,7 +17,7 @@
                 <div class="col-12 col-lg-6">
                     <div class="row g-3">
                         <div class="col-12">
-                            <label for="image" class="form-label">Upload de Imagem</label>
+                            <label for="image" class="form-label">Subir imagem de Divulgação</label>
                             <input id="image" name="image" type="file" accept="image/*" class="form-control">
                         </div>
 
@@ -25,16 +25,16 @@
                             <label for="name" class="form-label">Nome do curso</label>
                             <input id="name" name="name" class="form-control" value="{{ old('name') }}" required>
                         </div>
+                        <div class="col-12">
+                            <label for="description" class="form-label">Descrição do Curso</label>
+                            <textarea id="description" name="description" class="form-control"
+                                rows="4">{{ old('description') }}</textarea>
+                        </div>
                     </div>
                 </div>
 
                 <div class="col-12 col-lg-6">
                     <div class="row g-3">
-                        <div class="col-12">
-                            <label for="description" class="form-label">Descricao do Curso</label>
-                            <textarea id="description" name="description" class="form-control"
-                                rows="4">{{ old('description') }}</textarea>
-                        </div>
 
                         <div class="col-md-6">
                             <label for="hours" class="form-label">Horas</label>
@@ -43,22 +43,40 @@
                         </div>
 
                         <div class="col-md-6">
-                            <label for="course_date" class="form-label">Data</label>
-                            <input id="course_date" name="course_date" type="date" class="form-control"
-                                value="{{ old('course_date') }}">
+                            <label for="start_date" class="form-label">Data de início</label>
+                            <input id="start_date" name="start_date" type="date" class="form-control"
+                                value="{{ old('start_date') }}">
                         </div>
 
                         <div class="col-md-6">
-                            <label for="minimum_frequency" class="form-label">Frequencia minima (%)</label>
+                            <label for="end_date" class="form-label">Data de término</label>
+                            <input id="end_date" name="end_date" type="date" class="form-control"
+                                value="{{ old('end_date') }}">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="responsible" class="form-label">Responsável</label>
+                            <input id="responsible" name="responsible" class="form-control"
+                                value="{{ old('responsible') }}" placeholder="Nome do responsável pelo curso">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="minimum_frequency" class="form-label">Frequência mínima (%)</label>
                             <input id="minimum_frequency" name="minimum_frequency" type="number" min="0" max="100"
                                 step="0.01" class="form-control" value="{{ old('minimum_frequency', 75) }}">
                         </div>
 
                         <div class="col-md-6">
-                            <label for="minimum_grade" class="form-label">Nota minima</label>
+                            <label for="minimum_grade" class="form-label">Nota mínima</label>
                             <input id="minimum_grade" name="minimum_grade" type="number" min="0" max="10" step="0.01"
                                 class="form-control" value="{{ old('minimum_grade') }}" placeholder="Opcional">
                         </div>
+
+                        <div class="col-12">
+                            <label for="image_bg" class="form-label">Subir imagem de fundo do curso</label>
+                            <input id="image_bg" name="image_bg" type="file" accept="image/*" class="form-control">
+                        </div>
+
                     </div>
                 </div>
 
