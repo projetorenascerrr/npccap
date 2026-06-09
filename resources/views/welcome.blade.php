@@ -84,14 +84,24 @@
         <section class="hero-box rounded-4 p-4 p-lg-5 mb-4 mb-lg-5 fade-up">
             <div class="row align-items-center g-4">
                 <div class="col-lg-8">
+                    <a class="text-decoration-none" href="{{ route('courses') }}">
                     <span class="section-title">NPCCAP</span>
-                    <h1 class="display-5 fw-semibold mt-2 mb-3">Capacitacao profissional com foco em resultados reais
+                    <h1 class="display-5 fw-semibold mt-2 mb-3">Capacitação profissional com foco em resultados reais
                     </h1>
-                    <p class="text-soft fs-5 mb-0">
-                        Conheca nossos cursos disponiveis e participe de jornadas de aprendizado com metodologia
-                        pratica,
-                        instrutores qualificados e certificacao.
+                    <p class="text-soft fs-5 mb-3">
+                        Conheca os cursos disponiveis e participe do aprendizado com metodologia pratica.
                     </p>
+                    @guest
+                    <div class="d-flex gap-2">
+                        <a href="{{ route('login') }}" class="btn btn-light btn-sm">Entrar</a>
+                        <a href="{{ route('register') }}" class="btn btn-outline-light btn-sm">Cadastrar</a>
+                    </div>
+                    @else
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <button type="submit" class="btn btn-outline-light btn-sm">Sair</button>
+                    </form>
+                    @endguest
                 </div>
                 <div class="col-lg-4">
                     <div class="cta-box rounded-4 p-4 text-center">
@@ -141,6 +151,10 @@
                                 mercado.' }}
                             </p>
 
+                            <a href="{{ route('courses.show', $course) }}" class="btn btn-outline-success btn-strong btn-sm mb-3">
+                                INSCREVER-SE
+                            </a>
+
                             <div class="mt-auto small text-soft">
                                 @if($course->start_date)
                                 <div><strong class="text-light">Inicio:</strong> {{ $course->start_date->format('d/m/Y')
@@ -154,6 +168,7 @@
                                 <div><strong class="text-light">Responsavel:</strong> {{ $course->responsible }}</div>
                                 @endif
                             </div>
+
                         </div>
                     </article>
                 </div>
