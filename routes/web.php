@@ -6,8 +6,11 @@ use App\Http\Controllers\CourseController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\SignatureController;
 use App\Http\Controllers\StudentController;
+use App\Http\Controllers\StudentAuthController;
+use App\Http\Controllers\StudentPortalController;
 use App\Models\Course;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
 
 Route::get('/', function () {
     $courses = Course::query()
@@ -21,18 +24,48 @@ Route::get('/', function () {
     ]);
 })->name('welcome');
 
-Route::middleware('guest')->group(function () {
-    Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
-    Route::post('/login', [AuthController::class, 'login'])->name('login.perform');
-    Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register');
-    Route::post('/register', [AuthController::class, 'register'])->name('register.perform');
+// Student Guest Routes
+Route::middleware('guest:student')->group(function () {
+    Route::get('/login', [StudentAuthController::class, 'showLoginForm'])->name('login');
+    Route::post('/login', [StudentAuthController::class, 'login'])->name('login.perform');
+    Route::get('/register', [StudentAuthController::class, 'showRegisterForm'])->name('register');
+    Route::post('/register', [StudentAuthController::class, 'register'])->name('register.perform');
 });
 
-Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+// Admin Guest Routes
+Route::middleware('guest:web')->prefix('admin')->group(function () {
+    Route::get('/login', [AuthController::class, 'showLoginForm'])->name('admin.login');
+    Route::post('/login', [AuthController::class, 'login'])->name('admin.login.perform');
+    Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('admin.register');
+    Route::post('/register', [AuthController::class, 'register'])->name('admin.register.perform');
+});
 
+// Shared Logout Route
+Route::post('/logout', function (\Illuminate\Http\Request $request) {
+    if (Auth::guard('student')->check()) {
+        Auth::guard('student')->logout();
+    } else {
+        Auth::guard('web')->logout();
+    }
+
+    $request->session()->invalidate();
+    $request->session()->regenerateToken();
+
+    return redirect()->route('welcome');
+})->name('logout');
+
+// Public Validation Route
 Route::get('/validar/{code}', [CertificateController::class, 'validateCertificate'])->name('certificates.validate');
 
-Route::middleware('auth')->group(function () {
+// Student Authenticated Routes
+Route::middleware('auth:student')->prefix('student')->group(function () {
+    Route::get('/dashboard', [StudentPortalController::class, 'index'])->name('student.dashboard');
+    Route::get('/courses/{course}/enroll', [StudentPortalController::class, 'enroll'])->name('student.courses.enroll');
+    Route::get('/certificates/{certificate}/pdf', [StudentPortalController::class, 'downloadCertificate'])->name('student.certificates.pdf');
+});
+
+// Admin Authenticated Routes
+Route::middleware('auth:web')->prefix('admin')->group(function () {
     Route::get('/home', [HomeController::class, 'index'])->name('home');
     Route::get('/certificates', [CertificateController::class, 'index'])->name('certificates.index');
     Route::get('/certificates/show', [CertificateController::class, 'show'])->name('certificates.show');
@@ -57,3 +90,4 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/students', [StudentController::class, 'index'])->name('students.index');
 });
+

@@ -84,24 +84,36 @@
         <section class="hero-box rounded-4 p-4 p-lg-5 mb-4 mb-lg-5 fade-up">
             <div class="row align-items-center g-4">
                 <div class="col-lg-8">
-                    <a class="text-decoration-none" href="{{ route('courses') }}">
+                    <a class="text-decoration-none text-reset" href="{{ route('welcome') }}">
                     <span class="section-title">NPCCAP</span>
                     <h1 class="display-5 fw-semibold mt-2 mb-3">Capacitação profissional com foco em resultados reais
                     </h1>
+                    </a>
                     <p class="text-soft fs-5 mb-3">
                         Conheca os cursos disponiveis e participe do aprendizado com metodologia pratica.
                     </p>
-                    @guest
+                    @auth('student')
+                    <div class="d-flex gap-2">
+                        <a href="{{ route('student.dashboard') }}" class="btn btn-success btn-sm">Área do Aluno</a>
+                        <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+                            <button type="submit" class="btn btn-outline-light btn-sm">Sair</button>
+                        </form>
+                    </div>
+                    @elseauth('web')
+                    <div class="d-flex gap-2">
+                        <a href="{{ route('courses.index') }}" class="btn btn-danger btn-sm">Painel Admin</a>
+                        <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+                            <button type="submit" class="btn btn-outline-light btn-sm">Sair</button>
+                        </form>
+                    </div>
+                    @else
                     <div class="d-flex gap-2">
                         <a href="{{ route('login') }}" class="btn btn-light btn-sm">Entrar</a>
                         <a href="{{ route('register') }}" class="btn btn-outline-light btn-sm">Cadastrar</a>
                     </div>
-                    @else
-                    <form method="POST" action="{{ route('logout') }}">
-                        @csrf
-                        <button type="submit" class="btn btn-outline-light btn-sm">Sair</button>
-                    </form>
-                    @endguest
+                    @endauth
                 </div>
                 <div class="col-lg-4">
                     <div class="cta-box rounded-4 p-4 text-center">
@@ -151,9 +163,15 @@
                                 mercado.' }}
                             </p>
 
-                            <a href="{{ route('courses.show', $course) }}" class="btn btn-outline-success btn-strong btn-sm mb-3">
+                            @auth('student')
+                            <a href="{{ route('student.courses.enroll', $course) }}" class="btn btn-outline-success btn-strong btn-sm mb-3">
                                 INSCREVER-SE
                             </a>
+                            @else
+                            <a href="{{ route('login', ['course_id' => $course->id]) }}" class="btn btn-outline-success btn-strong btn-sm mb-3">
+                                INSCREVER-SE
+                            </a>
+                            @endauth
 
                             <div class="mt-auto small text-soft">
                                 @if($course->start_date)
