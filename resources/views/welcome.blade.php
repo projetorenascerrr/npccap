@@ -6,7 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>NPCCAP | Formacao e Cursos</title>
 
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <link rel="stylesheet" href="{{ asset('css/app.css') }}">
+    <script src="{{ asset('js/app.js') }}"></script>
 
     <style>
         .institutional-page {
@@ -85,9 +86,9 @@
             <div class="row align-items-center g-4">
                 <div class="col-lg-8">
                     <a class="text-decoration-none text-reset" href="{{ route('welcome') }}">
-                    <span class="section-title">NPCCAP</span>
-                    <h1 class="display-5 fw-semibold mt-2 mb-3">Capacitação profissional com foco em resultados reais
-                    </h1>
+                        <span class="section-title">NPCCAP</span>
+                        <h1 class="display-5 fw-semibold mt-2 mb-3">Capacitação profissional com foco em resultados reais
+                        </h1>
                     </a>
                     <p class="text-soft fs-5 mb-3">
                         Conheca os cursos disponiveis e participe do aprendizado com metodologia pratica.
