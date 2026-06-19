@@ -93,13 +93,13 @@
                             <a href="#"
                                 class="d-flex align-items-center text-white text-decoration-none dropdown-toggle px-1 py-1"
                                 id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
-                                <img src="https://github.com/mdo.png" alt="mdo" width="32" height="32"
+                                <img src="/icon/android-chrome-192x192.png" alt="mdo" width="32" height="32"
                                     class="rounded-circle me-0 me-sm-2">
                                 <strong class="d-none d-sm-inline">Admin</strong>
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end dropdown-menu-dark text-small shadow"
                                 aria-labelledby="dropdownUser1">
-                                <li><a class="dropdown-item" href="#">Novo certificado...</a></li>
+                                <li><a class="dropdown-item" href="">Novo certificado...</a></li>
                                 <li><a class="dropdown-item" href="#">Configurações</a></li>
                                 <li><a class="dropdown-item" href="#">Perfil</a></li>
                                 <li>
