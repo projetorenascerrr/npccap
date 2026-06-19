@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Painel Administrativo - Entrar | NPCCAP</title>
+    <title>Redefinir Senha - Painel Administrativo | NPCCAP</title>
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
@@ -57,43 +57,47 @@
     <div class="container py-5">
         <div class="auth-card rounded-4 p-4 p-lg-5 mx-auto" style="max-width: 460px;">
             <div class="text-center mb-4">
-                <span class="badge text-bg-danger-subtle text-danger border border-danger-subtle mb-2 px-3 py-2">PAINEL ADMINISTRATIVO</span>
-                <h1 class="h3 fw-semibold mb-1 text-white">Login de Admin</h1>
-                <p class="text-secondary small">Acesso restrito para administradores do sistema.</p>
+                <span class="badge text-bg-danger-subtle text-danger border border-danger-subtle mb-2 px-3 py-2">REDEFINIÇÃO DE SENHA</span>
+                <h1 class="h3 fw-semibold mb-1 text-white">Redefinir Senha</h1>
+                <p class="text-secondary small">Crie uma nova senha de acesso administrativo forte.</p>
             </div>
 
-            <form method="POST" action="{{ route('admin.login.perform') }}">
+            @if($errors->any())
+            <div class="alert alert-danger border-0 shadow-sm text-center mb-4">
+                {{ $errors->first() }}
+            </div>
+            @endif
+
+            <form method="POST" action="{{ route('admin.password.update') }}">
                 @csrf
+                <input type="hidden" name="token" value="{{ $token }}">
 
                 <div class="mb-3">
                     <label for="email" class="form-label">E-mail Corporativo</label>
-                    <input id="email" type="email" name="email" value="{{ old('email') }}" placeholder="admin@npccap.com"
-                        class="form-control form-control-lg @error('email') is-invalid @enderror" required autofocus>
+                    <input id="email" type="email" name="email" value="{{ old('email', $email) }}" placeholder="admin@npccap.com"
+                        class="form-control form-control-lg @error('email') is-invalid @enderror" required readonly>
                     @error('email')
                     <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>
 
-                <div class="mb-4">
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <label for="password" class="form-label mb-0">Senha de Acesso</label>
-                        <a href="{{ route('admin.password.request') }}" class="text-danger small text-decoration-none">Esqueceu sua senha?</a>
-                    </div>
-                    <input id="password" type="password" name="password" placeholder="Digite sua senha"
-                        class="form-control form-control-lg @error('password') is-invalid @enderror" required>
+                <div class="mb-3">
+                    <label for="password" class="form-label">Nova Senha</label>
+                    <input id="password" type="password" name="password" placeholder="Mínimo 8 caracteres"
+                        class="form-control form-control-lg @error('password') is-invalid @enderror" required autofocus>
                     @error('password')
                     <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>
 
-                <button type="submit" class="btn btn-admin w-100 text-white py-2.5 fw-medium">Entrar no Painel</button>
-            </form>
+                <div class="mb-4">
+                    <label for="password_confirmation" class="form-label">Confirmar Nova Senha</label>
+                    <input id="password_confirmation" type="password" name="password_confirmation" placeholder="Repita a nova senha"
+                        class="form-control form-control-lg" required>
+                </div>
 
-            <div class="text-center mt-4 border-top border-secondary pt-3">
-                <a href="{{ route('welcome') }}" class="text-secondary small text-decoration-none">
-                    <i class="bi bi-arrow-left"></i> Voltar ao site institucional
-                </a>
-            </div>
+                <button type="submit" class="btn btn-admin w-100 text-white py-2.5 fw-medium">Redefinir Senha</button>
+            </form>
         </div>
     </div>
 </body>

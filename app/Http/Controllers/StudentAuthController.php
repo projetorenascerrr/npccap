@@ -9,6 +9,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
+use Illuminate\Support\Facades\Password as PasswordBroker;
+use Illuminate\Auth\Events\PasswordReset;
+use Illuminate\Support\Str;
 
 class StudentAuthController extends Controller
 {
@@ -58,11 +61,16 @@ class StudentAuthController extends Controller
 
     public function register(Request $request)
     {
+        if ($request->has('cpf')) {
+            $request->merge([
+                'cpf' => $this->normalizeCpf((string) $request->input('cpf')),
+            ]);
+        }
+
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'cpf' => ['required', 'string', 'regex:/^(\d{11}|\d{3}\.\d{3}\.\d{3}-\d{2})$/', 'unique:student_users,cpf'],
             'email' => ['required', 'email', 'max:255', 'unique:student_users,email'],
-            'birth_date' => ['required', 'date'],
             'password' => ['required', 'confirmed', Password::defaults()],
         ], [
             'cpf.regex' => 'O CPF deve ter 11 dígitos ou estar no formato 000.000.000-00.',
@@ -70,13 +78,12 @@ class StudentAuthController extends Controller
             'email.unique' => 'Este e-mail já está cadastrado.',
         ]);
 
-        $normalizedCpf = $this->normalizeCpf($validated['cpf']);
+        $normalizedCpf = $validated['cpf'];
 
         $studentUser = StudentUser::create([
             'name' => $validated['name'],
             'cpf' => $normalizedCpf,
             'email' => $validated['email'],
-            'birth_date' => $validated['birth_date'],
             'password' => Hash::make($validated['password']),
         ]);
 
@@ -133,5 +140,63 @@ class StudentAuthController extends Controller
         }
 
         return preg_replace('/(\d{3})(\d{3})(\d{3})(\d{2})/', '$1.$2.$3-$4', $onlyNumbers) ?? $cpf;
+    }
+
+    public function showForgotPasswordForm()
+    {
+        return view('student.auth.forgot-password');
+    }
+
+    public function sendResetLinkEmail(Request $request)
+    {
+        $request->validate([
+            'email' => ['required', 'email', 'exists:student_users,email'],
+        ], [
+            'email.exists' => 'Não conseguimos encontrar um aluno com esse endereço de e-mail.',
+        ]);
+
+        $status = PasswordBroker::broker('student_users')->sendResetLink(
+            $request->only('email')
+        );
+
+        return $status === PasswordBroker::RESET_LINK_SENT
+            ? back()->with('success', 'Enviamos o link de recuperação de senha para o seu e-mail!')
+            : back()->withErrors(['email' => __($status)]);
+    }
+
+    public function showResetPasswordForm(Request $request, $token)
+    {
+        return view('student.auth.reset-password', [
+            'token' => $token,
+            'email' => $request->query('email')
+        ]);
+    }
+
+    public function resetPassword(Request $request)
+    {
+        $request->validate([
+            'token' => 'required',
+            'email' => ['required', 'email', 'exists:student_users,email'],
+            'password' => ['required', 'confirmed', Password::defaults()],
+        ], [
+            'email.exists' => 'Não conseguimos encontrar um aluno com esse endereço de e-mail.',
+        ]);
+
+        $status = PasswordBroker::broker('student_users')->reset(
+            $request->only('email', 'password', 'password_confirmation', 'token'),
+            function ($studentUser, $password) {
+                $studentUser->forceFill([
+                    'password' => Hash::make($password)
+                ])->setRememberToken(Str::random(60));
+
+                $studentUser->save();
+
+                event(new PasswordReset($studentUser));
+            }
+        );
+
+        return $status === PasswordBroker::PASSWORD_RESET
+            ? redirect()->route('login')->with('success', 'Sua senha foi redefinida com sucesso!')
+            : back()->withErrors(['email' => __($status)]);
     }
 }

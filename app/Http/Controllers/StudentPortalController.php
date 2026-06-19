@@ -8,6 +8,8 @@ use App\Models\Certificate;
 use App\Models\Signature;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rules\Password;
 use Barryvdh\DomPDF\Facade\Pdf;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
@@ -94,5 +96,83 @@ class StudentPortalController extends Controller
         ])->setPaper('a4', 'landscape');
 
         return $pdf->stream('certificado-' . $certificate->validation_code . '.pdf');
+    }
+
+    public function editProfile()
+    {
+        $studentUser = Auth::guard('student')->user();
+        return view('student.profile', compact('studentUser'));
+    }
+
+    public function updateProfile(Request $request)
+    {
+        /** @var \App\Models\StudentUser $studentUser */
+        $studentUser = Auth::guard('student')->user();
+
+        // Normalize CPF before validation
+        if ($request->has('cpf')) {
+            $request->merge([
+                'cpf' => $this->normalizeCpf((string) $request->input('cpf')),
+            ]);
+        }
+
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'cpf' => [
+                'required',
+                'string',
+                'regex:/^(\d{11}|\d{3}\.\d{3}\.\d{3}-\d{2})$/',
+                'unique:student_users,cpf,' . $studentUser->id
+            ],
+            'email' => ['required', 'email', 'max:255', 'unique:student_users,email,' . $studentUser->id],
+            'password' => ['nullable', 'confirmed', Password::defaults()],
+        ], [
+            'cpf.regex' => 'O CPF deve ter 11 dígitos ou estar no formato 000.000.000-00.',
+            'cpf.unique' => 'Este CPF já está cadastrado por outro usuário.',
+            'email.unique' => 'Este e-mail já está cadastrado por outro usuário.',
+        ]);
+
+        $oldCpf = $studentUser->cpf;
+        $newCpf = $validated['cpf'];
+        $newName = $validated['name'];
+        $newEmail = $validated['email'];
+
+        // Update student user details
+        $studentUser->name = $newName;
+        $studentUser->cpf = $newCpf;
+        $studentUser->email = $newEmail;
+
+        if ($request->filled('password')) {
+            $studentUser->password = Hash::make($validated['password']);
+        }
+
+        $studentUser->save();
+
+        // Sync updates to students & certificates tables for integrity
+        // 1. Update students table
+        Student::where('cpf', $oldCpf)->update([
+            'cpf' => $newCpf,
+            'name' => $newName,
+            'email' => $newEmail,
+        ]);
+
+        // 2. Update certificates table
+        \App\Models\Certificate::where('cpf', $oldCpf)->update([
+            'cpf' => $newCpf,
+            'student_name' => $newName,
+        ]);
+
+        return redirect()->route('student.profile.edit')->with('success', 'Perfil atualizado com sucesso!');
+    }
+
+    private function normalizeCpf(string $cpf): string
+    {
+        $onlyNumbers = preg_replace('/\D/', '', $cpf) ?? '';
+
+        if (strlen($onlyNumbers) !== 11) {
+            return $cpf;
+        }
+
+        return preg_replace('/(\d{3})(\d{3})(\d{3})(\d{2})/', '$1.$2.$3-$4', $onlyNumbers) ?? $cpf;
     }
 }

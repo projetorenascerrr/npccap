@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Portal do Aluno - Entrar | NPCCAP</title>
+    <title>Recuperar Senha - Portal do Aluno | NPCCAP</title>
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
@@ -62,9 +62,9 @@
         <div class="auth-card rounded-4 p-4 p-lg-5 mx-auto" style="max-width: 460px;">
             <div class="text-center mb-4">
                 <img src="{{ asset('images/logo_sejuc.svg') }}" alt="Logo" class="img-fluid" style="height: 32px;">
-                <span class="badge text-bg-success-subtle text-success border border-success-subtle mb-2 px-3 py-2">PORTAL DO ALUNO</span>
-                <h1 class="h3 fw-semibold mb-1">Acesse sua Área</h1>
-                <p class="text-soft">Entre para gerenciar seus cursos e certificados.</p>
+                <span class="badge text-bg-success-subtle text-success border border-success-subtle mb-2 px-3 py-2">RECUPERAÇÃO DE SENHA</span>
+                <h1 class="h3 fw-semibold mb-1">Recuperar Senha</h1>
+                <p class="text-soft">Digite seu e-mail cadastrado para receber as instruções de recuperação.</p>
             </div>
 
             @if(session('success'))
@@ -73,46 +73,30 @@
             </div>
             @endif
 
-            <form method="POST" action="{{ route('login.perform') }}">
+            @if($errors->any())
+            <div class="alert alert-danger border-0 shadow-sm text-center mb-4">
+                {{ $errors->first() }}
+            </div>
+            @endif
+
+            <form method="POST" action="{{ route('password.email') }}">
                 @csrf
 
-                @if($course_id)
-                <input type="hidden" name="course_id" value="{{ $course_id }}">
-                @endif
-
-                <div class="mb-3">
-                    <label for="cpf" class="form-label">CPF</label>
-                    <input id="cpf" type="text" name="cpf" value="{{ old('cpf') }}" placeholder="000.000.000-00"
-                        class="form-control form-control-lg @error('cpf') is-invalid @enderror" required autofocus>
-                    @error('cpf')
-                    <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
-
                 <div class="mb-4">
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <label for="password" class="form-label mb-0">Senha</label>
-                        <a href="{{ route('password.request') }}" class="text-success small text-decoration-none">Esqueceu sua senha?</a>
-                    </div>
-                    <input id="password" type="password" name="password" placeholder="Digite sua senha"
-                        class="form-control form-control-lg @error('password') is-invalid @enderror" required>
-                    @error('password')
+                    <label for="email" class="form-label">E-mail Cadastrado</label>
+                    <input id="email" type="email" name="email" value="{{ old('email') }}" placeholder="seu.email@exemplo.com"
+                        class="form-control form-control-lg @error('email') is-invalid @enderror" required autofocus>
+                    @error('email')
                     <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>
 
-                <button type="submit" class="btn btn-student w-100 text-white py-2.5 fw-medium">Entrar</button>
+                <button type="submit" class="btn btn-student w-100 text-white py-2.5 fw-medium">Enviar Link de Recuperação</button>
             </form>
 
-            <p class="text-center text-soft small mt-4">
-                Não tem cadastro?
-                <a href="{{ route('register', $course_id ? ['course_id' => $course_id] : []) }}" class="text-success text-decoration-none fw-semibold">
-                    Cadastre-se aqui
-                </a>
-            </p>
-            <div class="text-center mt-3">
-                <a href="{{ route('welcome') }}" class="text-soft small text-decoration-none">
-                    <i class="bi bi-arrow-left"></i> Voltar ao início
+            <div class="text-center mt-4 border-top border-secondary pt-3">
+                <a href="{{ route('login') }}" class="text-soft small text-decoration-none">
+                    <i class="bi bi-arrow-left"></i> Voltar ao login de aluno
                 </a>
             </div>
         </div>

@@ -38,7 +38,6 @@ class StudentAuthTest extends TestCase
             'name' => 'John Doe',
             'cpf' => '123.456.789-00',
             'email' => 'john@example.com',
-            'birth_date' => '2000-01-01',
             'password' => 'password123',
             'password_confirmation' => 'password123',
         ]);
@@ -62,7 +61,6 @@ class StudentAuthTest extends TestCase
             'name' => 'Jane Doe',
             'cpf' => '987.654.321-11',
             'email' => 'jane@example.com',
-            'birth_date' => '1995-05-15',
             'password' => 'password123',
             'password_confirmation' => 'password123',
             'course_id' => $course->id,
@@ -83,4 +81,210 @@ class StudentAuthTest extends TestCase
             'status' => 'inscrito',
         ]);
     }
+
+    public function test_student_registration_fails_if_cpf_already_exists(): void
+    {
+        StudentUser::create([
+            'name' => 'Existing User',
+            'cpf' => '123.456.789-00',
+            'email' => 'existing@example.com',
+            'birth_date' => '1990-01-01',
+            'password' => bcrypt('password123'),
+        ]);
+
+        $response = $this->post('/register', [
+            'name' => 'John Doe',
+            'cpf' => '123.456.789-00',
+            'email' => 'john@example.com',
+            'password' => 'password123',
+            'password_confirmation' => 'password123',
+        ]);
+
+        $response->assertSessionHasErrors(['cpf' => 'Este CPF já está cadastrado.']);
+    }
+
+    public function test_student_registration_fails_if_unformatted_cpf_already_exists(): void
+    {
+        StudentUser::create([
+            'name' => 'Existing User',
+            'cpf' => '123.456.789-00',
+            'email' => 'existing@example.com',
+            'birth_date' => '1990-01-01',
+            'password' => bcrypt('password123'),
+        ]);
+
+        $response = $this->post('/register', [
+            'name' => 'John Doe',
+            'cpf' => '12345678900',
+            'email' => 'john@example.com',
+            'password' => 'password123',
+            'password_confirmation' => 'password123',
+        ]);
+
+        $response->assertSessionHasErrors(['cpf' => 'Este CPF já está cadastrado.']);
+    }
+
+    public function test_student_registration_fails_if_email_already_exists(): void
+    {
+        StudentUser::create([
+            'name' => 'Existing User',
+            'cpf' => '123.456.789-00',
+            'email' => 'existing@example.com',
+            'birth_date' => '1990-01-01',
+            'password' => bcrypt('password123'),
+        ]);
+
+        $response = $this->post('/register', [
+            'name' => 'John Doe',
+            'cpf' => '987.654.321-11',
+            'email' => 'existing@example.com',
+            'password' => 'password123',
+            'password_confirmation' => 'password123',
+        ]);
+
+        $response->assertSessionHasErrors(['email' => 'Este e-mail já está cadastrado.']);
+    }
+
+    public function test_authenticated_student_can_view_profile_edit_page(): void
+    {
+        $studentUser = StudentUser::create([
+            'name' => 'John Doe',
+            'cpf' => '123.456.789-00',
+            'email' => 'john@example.com',
+            'password' => bcrypt('password123'),
+        ]);
+
+        $response = $this->actingAs($studentUser, 'student')->get('/student/profile');
+        $response->assertStatus(200);
+        $response->assertSee('Editar Minhas Informações');
+    }
+
+    public function test_student_can_update_profile_successfully(): void
+    {
+        $studentUser = StudentUser::create([
+            'name' => 'John Doe',
+            'cpf' => '123.456.789-00',
+            'email' => 'john@example.com',
+            'password' => bcrypt('password123'),
+        ]);
+
+        $response = $this->actingAs($studentUser, 'student')
+            ->put('/student/profile', [
+                'name' => 'John Updated',
+                'cpf' => '123.456.789-00',
+                'email' => 'john.updated@example.com',
+            ]);
+
+        $response->assertRedirect('/student/profile');
+        $response->assertSessionHas('success', 'Perfil atualizado com sucesso!');
+
+        $this->assertDatabaseHas('student_users', [
+            'id' => $studentUser->id,
+            'name' => 'John Updated',
+            'email' => 'john.updated@example.com',
+        ]);
+    }
+
+    public function test_student_profile_update_syncs_to_enrollments_and_certificates(): void
+    {
+        $studentUser = StudentUser::create([
+            'name' => 'John Doe',
+            'cpf' => '123.456.789-00',
+            'email' => 'john@example.com',
+            'password' => bcrypt('password123'),
+        ]);
+
+        $course = Course::create([
+            'name' => 'Curso de Teste',
+            'hours' => 40,
+            'status' => 'ativo',
+        ]);
+
+        $student = Student::create([
+            'course_id' => $course->id,
+            'name' => 'John Doe',
+            'cpf' => '123.456.789-00',
+            'email' => 'john@example.com',
+            'status' => 'inscrito',
+        ]);
+
+        $certificate = \App\Models\Certificate::create([
+            'course_id' => $course->id,
+            'student_id' => $student->id,
+            'student_name' => 'John Doe',
+            'cpf' => '123.456.789-00',
+            'course_name' => 'Curso de Teste',
+            'issue_date' => '2026-06-18',
+            'validation_code' => 'CERT-2026-000001',
+        ]);
+
+        // Update profile, changing CPF, name and email
+        $response = $this->actingAs($studentUser, 'student')
+            ->put('/student/profile', [
+                'name' => 'John Changed',
+                'cpf' => '987.654.321-99', // Change CPF
+                'email' => 'john.changed@example.com',
+            ]);
+
+        $response->assertRedirect('/student/profile');
+
+        // Check if student user updated
+        $this->assertDatabaseHas('student_users', [
+            'id' => $studentUser->id,
+            'name' => 'John Changed',
+            'cpf' => '987.654.321-99',
+            'email' => 'john.changed@example.com',
+        ]);
+
+        // Check if student enrollment record updated
+        $this->assertDatabaseHas('students', [
+            'id' => $student->id,
+            'name' => 'John Changed',
+            'cpf' => '987.654.321-99',
+            'email' => 'john.changed@example.com',
+        ]);
+
+        // Check if certificate updated
+        $this->assertDatabaseHas('certificates', [
+            'id' => $certificate->id,
+            'student_name' => 'John Changed',
+            'cpf' => '987.654.321-99',
+        ]);
+    }
+
+    public function test_student_profile_update_fails_with_duplicate_cpf_or_email(): void
+    {
+        $studentUserA = StudentUser::create([
+            'name' => 'User A',
+            'cpf' => '123.456.789-00',
+            'email' => 'usera@example.com',
+            'password' => bcrypt('password123'),
+        ]);
+
+        $studentUserB = StudentUser::create([
+            'name' => 'User B',
+            'cpf' => '987.654.321-11',
+            'email' => 'userb@example.com',
+            'password' => bcrypt('password123'),
+        ]);
+
+        // Try updating User A's CPF to User B's CPF
+        $response = $this->actingAs($studentUserA, 'student')
+            ->put('/student/profile', [
+                'name' => 'User A Updated',
+                'cpf' => '98765432111', // Unformatted but duplicate
+                'email' => 'usera@example.com',
+            ]);
+        $response->assertSessionHasErrors(['cpf']);
+
+        // Try updating User A's email to User B's email
+        $response = $this->actingAs($studentUserA, 'student')
+            ->put('/student/profile', [
+                'name' => 'User A Updated',
+                'cpf' => '123.456.789-00',
+                'email' => 'userb@example.com',
+            ]);
+        $response->assertSessionHasErrors(['email']);
+    }
 }
+

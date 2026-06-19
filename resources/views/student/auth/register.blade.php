@@ -61,6 +61,7 @@
     <div class="container py-5">
         <div class="auth-card rounded-4 p-4 p-lg-5 mx-auto" style="max-width: 500px;">
             <div class="text-center mb-4">
+                <img src="{{ asset('images/logo_sejuc.svg') }}" alt="Logo" class="img-fluid" style="height: 32px;">
                 <span class="badge text-bg-success-subtle text-success border border-success-subtle mb-2 px-3 py-2">PORTAL DO ALUNO</span>
                 <h1 class="h3 fw-semibold mb-1">Crie sua Conta</h1>
                 <p class="text-soft">Cadastre-se para acessar cursos e emitir seus certificados.</p>
@@ -70,7 +71,7 @@
                 @csrf
 
                 @if($course_id)
-                    <input type="hidden" name="course_id" value="{{ $course_id }}">
+                <input type="hidden" name="course_id" value="{{ $course_id }}">
                 @endif
 
                 <div class="mb-3">
@@ -101,15 +102,6 @@
                 </div>
 
                 <div class="mb-3">
-                    <label for="birth_date" class="form-label">Data de Nascimento</label>
-                    <input id="birth_date" type="date" name="birth_date" value="{{ old('birth_date') }}"
-                        class="form-control @error('birth_date') is-invalid @enderror" required>
-                    @error('birth_date')
-                    <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
-
-                <div class="mb-3">
                     <label for="password" class="form-label">Senha</label>
                     <input id="password" type="password" name="password" placeholder="Mínimo 8 caracteres"
                         class="form-control @error('password') is-invalid @enderror" required>
@@ -128,7 +120,7 @@
             </form>
 
             <p class="text-center text-soft small mt-4">
-                Já tem cadastro? 
+                Já tem cadastro?
                 <a href="{{ route('login', $course_id ? ['course_id' => $course_id] : []) }}" class="text-success text-decoration-none fw-semibold">
                     Entre aqui
                 </a>
@@ -140,6 +132,35 @@
             </div>
         </div>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const cpfInput = document.getElementById('cpf');
+            if (cpfInput) {
+                cpfInput.addEventListener('input', function(e) {
+                    let value = e.target.value;
+                    // Remove all non-digit characters
+                    value = value.replace(/\D/g, '');
+
+                    // Limit to 11 digits
+                    if (value.length > 11) {
+                        value = value.slice(0, 11);
+                    }
+
+                    // Apply the CPF mask formatting: 000.000.000-00
+                    if (value.length > 9) {
+                        value = value.replace(/^(\d{3})(\d{3})(\d{3})(\d{1,2})$/, '$1.$2.$3-$4');
+                    } else if (value.length > 6) {
+                        value = value.replace(/^(\d{3})(\d{3})(\d{1,3})$/, '$1.$2.$3');
+                    } else if (value.length > 3) {
+                        value = value.replace(/^(\d{3})(\d{1,3})$/, '$1.$2');
+                    }
+
+                    e.target.value = value;
+                });
+            }
+        });
+    </script>
 </body>
 
 </html>

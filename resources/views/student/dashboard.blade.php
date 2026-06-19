@@ -105,11 +105,15 @@
 
             <div class="d-flex align-items-center gap-3 ms-auto">
                 <span class="text-white d-none d-md-inline small">
-                    Olá, <strong class="text-success">{{ $studentUser->name }}</strong>
+                    Olá, <strong class="text-success">{{ explode(' ', trim($studentUser->name))[0] }}</strong>
                 </span>
 
                 <a href="{{ route('welcome') }}" class="btn btn-outline-light btn-sm">
                     Ver Cursos
+                </a>
+
+                <a href="{{ route('student.profile.edit') }}" class="btn btn-outline-success btn-sm">
+                    Editar Perfil
                 </a>
 
                 <form method="POST" action="{{ route('logout') }}">

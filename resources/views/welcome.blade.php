@@ -117,8 +117,8 @@
                 </div>
                 <div class="col-lg-4">
                     <div class="cta-box rounded-4 p-4 text-center">
-                        <p class="text-soft mb-2">Cursos disponiveis agora</p>
-                        <p class="display-4 fw-bold mb-0">{{ $courses->count() }}</p>
+                        <p class="text-soft mb-2">Cursos disponíveis agora</p>
+                        <p class="display-4 fw-bold mb-0" style="color: #10b981">{{ $courses->count() }}</p>
                     </div>
                 </div>
             </div>
@@ -126,14 +126,13 @@
 
         <section>
             <div class="d-flex justify-content-between align-items-center mb-3">
-                <h2 class="h3 fw-semibold mb-0">Cursos ativos</h2>
-                <span class="text-soft small">Ocultamos automaticamente cursos encerrados/finalizados</span>
+                <h2 class="h3 fw-semibold mb-0">Cursos Ativos</h2>
             </div>
 
             @if($courses->isEmpty())
             <div class="course-card rounded-4 p-5 text-center fade-up">
                 <h3 class="h4 mb-2">Nenhum curso ativo no momento</h3>
-                <p class="text-soft mb-0">Novas turmas serao publicadas em breve.</p>
+                <p class="text-soft mb-0">Novas turmas serão publicadas em breve.</p>
             </div>
             @else
             <div class="row g-4">

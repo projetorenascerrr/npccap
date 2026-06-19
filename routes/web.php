@@ -30,6 +30,11 @@ Route::middleware('guest:student')->group(function () {
     Route::post('/login', [StudentAuthController::class, 'login'])->name('login.perform');
     Route::get('/register', [StudentAuthController::class, 'showRegisterForm'])->name('register');
     Route::post('/register', [StudentAuthController::class, 'register'])->name('register.perform');
+
+    Route::get('/forgot-password', [StudentAuthController::class, 'showForgotPasswordForm'])->name('password.request');
+    Route::post('/forgot-password', [StudentAuthController::class, 'sendResetLinkEmail'])->name('password.email');
+    Route::get('/reset-password/{token}', [StudentAuthController::class, 'showResetPasswordForm'])->name('password.reset');
+    Route::post('/reset-password', [StudentAuthController::class, 'resetPassword'])->name('password.update');
 });
 
 // Admin Guest Routes
@@ -38,6 +43,11 @@ Route::middleware('guest:web')->prefix('admin')->group(function () {
     Route::post('/login', [AuthController::class, 'login'])->name('admin.login.perform');
     Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('admin.register');
     Route::post('/register', [AuthController::class, 'register'])->name('admin.register.perform');
+
+    Route::get('/forgot-password', [AuthController::class, 'showForgotPasswordForm'])->name('admin.password.request');
+    Route::post('/forgot-password', [AuthController::class, 'sendResetLinkEmail'])->name('admin.password.email');
+    Route::get('/reset-password/{token}', [AuthController::class, 'showResetPasswordForm'])->name('admin.password.reset');
+    Route::post('/reset-password', [AuthController::class, 'resetPassword'])->name('admin.password.update');
 });
 
 // Shared Logout Route
@@ -62,6 +72,8 @@ Route::middleware('auth:student')->prefix('student')->group(function () {
     Route::get('/dashboard', [StudentPortalController::class, 'index'])->name('student.dashboard');
     Route::get('/courses/{course}/enroll', [StudentPortalController::class, 'enroll'])->name('student.courses.enroll');
     Route::get('/certificates/{certificate}/pdf', [StudentPortalController::class, 'downloadCertificate'])->name('student.certificates.pdf');
+    Route::get('/profile', [StudentPortalController::class, 'editProfile'])->name('student.profile.edit');
+    Route::put('/profile', [StudentPortalController::class, 'updateProfile'])->name('student.profile.update');
 });
 
 // Admin Authenticated Routes

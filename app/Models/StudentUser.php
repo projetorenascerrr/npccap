@@ -10,6 +10,17 @@ class StudentUser extends Authenticatable
 {
     use HasFactory, Notifiable;
 
+    /**
+     * Send the password reset notification.
+     *
+     * @param  string  $token
+     * @return void
+     */
+    public function sendPasswordResetNotification($token)
+    {
+        $this->notify(new \App\Notifications\StudentResetPasswordNotification($token));
+    }
+
     protected $table = 'student_users';
 
     protected $fillable = [
