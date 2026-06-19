@@ -2,10 +2,9 @@
 
 return [
 
-    'default' => env('MAIL_MAILER', 'log'),
+    'default' => env('MAIL_MAILER', 'smtp'),
 
     'mailers' => [
-
 
         'smtp' => [
             'transport' => 'smtp',
@@ -18,13 +17,7 @@ return [
             'encryption' => env('MAIL_ENCRYPTION', 'ssl'),
             'timeout' => null,
             'local_domain' => env('MAIL_EHLO_DOMAIN', parse_url(env('APP_URL', 'https://npccap.sejucrr.org'), PHP_URL_HOST)),
-            'stream' => [
-                'ssl' => [
-                    'allow_self_signed' => true,
-                    'verify_peer' => false,
-                    'verify_peer_name' => false,
-                ],
-            ],
+            'verify_peer' => env('MAIL_VERIFY_PEER', true),
         ],
 
         'ses' => [
