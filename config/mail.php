@@ -17,7 +17,13 @@ return [
             'encryption' => env('MAIL_ENCRYPTION', 'ssl'),
             'timeout' => null,
             'local_domain' => env('MAIL_EHLO_DOMAIN', parse_url(env('APP_URL', 'https://npccap.sejucrr.org'), PHP_URL_HOST)),
-            'verify_peer' => env('MAIL_VERIFY_PEER', true),
+            'stream' => [
+                'ssl' => [
+                    'allow_self_signed' => true,
+                    'verify_peer' => false,
+                    'verify_peer_name' => false,
+                ],
+            ],
         ],
 
         'ses' => [
@@ -67,17 +73,6 @@ return [
         ],
 
     ],
-
-    /*
-    |--------------------------------------------------------------------------
-    | Global "From" Address
-    |--------------------------------------------------------------------------
-    |
-    | You may wish for all emails sent by your application to be sent from
-    | the same address. Here you may specify a name and address that is
-    | used globally for all emails that are sent by your application.
-    |
-    */
 
     'from' => [
         'address' => env('MAIL_FROM_ADDRESS', 'contato@sejucrr.org'),
