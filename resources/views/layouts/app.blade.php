@@ -25,7 +25,7 @@
             <div class="offcanvas-body d-flex flex-column flex-shrink-0 p-3 text-white bg-dark sidebar-frame">
                 <a href="{{ route('certificates.index') }}"
                     class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none">
-                    <img src="{{ asset('images/logo.svg') }}" alt="Logo NPCCAP" class="brand-logo me-2">
+                    <img src="{{ asset('images/logo_sejuc.svg') }}" alt="Logo" class="img-fluid me-2" style="height: 32px;">
                     <span class="fs-4">NPCCAP</span>
                 </a>
                 <hr>

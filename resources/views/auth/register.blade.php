@@ -44,6 +44,9 @@
 <body class="auth-page d-flex align-items-center">
     <div class="container py-5">
         <div class="auth-card rounded-4 p-4 p-lg-5 mx-auto" style="max-width: 460px;">
+            <div class="text-center mb-4">
+                <img src="{{ asset('images/logo_sejuc.svg') }}" alt="Logo" class="img-fluid" style="height: 32px;">
+            </div>
             <h1 class="h3 fw-semibold mb-3 text-center">Crie sua conta</h1>
             <p class="text-soft text-center mb-4">Cadastre-se para acessar a plataforma de inscrição.</p>
 

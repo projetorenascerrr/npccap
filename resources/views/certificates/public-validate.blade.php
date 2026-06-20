@@ -12,6 +12,9 @@
 </head>
 <body class="d-flex align-items-center justify-content-center min-vh-100">
     <div class="card bg-dark border-secondary text-center p-5" style="max-width:540px;width:100%">
+        <div class="mb-4">
+            <img src="{{ asset('images/logo_sejuc.svg') }}" alt="Logo" class="img-fluid" style="height: 32px;">
+        </div>
         <div class="mb-3">
             <span class="badge valid-badge fs-6 px-4 py-2">✔ Certificado Válido</span>
         </div>
