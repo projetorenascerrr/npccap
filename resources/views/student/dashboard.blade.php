@@ -99,6 +99,7 @@
     <nav class="navbar navbar-expand-lg nav-portal sticky-top py-3">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center gap-2 text-white fw-bold" href="#">
+                <img src="{{ asset('images/logo_sejuc.svg') }}" alt="Logo" class="img-fluid" style="height: 32px;">
                 <span class="fs-4 tracking-wider text-success">NPCCAP</span>
                 <span class="badge text-bg-success-subtle text-success border border-success-subtle d-none d-sm-inline">Portal do Aluno</span>
             </a>
@@ -231,24 +232,24 @@
                                 </td>
                                 <td class="py-3 text-center">
                                     @if($enrollment->status === \App\Models\Student::STATUS_INSCRITO)
-                                        <span class="badge rounded-pill badge-status badge-inscrito">INSCRITO</span>
+                                    <span class="badge rounded-pill badge-status badge-inscrito">INSCRITO</span>
                                     @elseif($enrollment->status === \App\Models\Student::STATUS_CONFIRMADO)
-                                        <span class="badge rounded-pill badge-status badge-confirmado">CONFIRMADO</span>
+                                    <span class="badge rounded-pill badge-status badge-confirmado">CONFIRMADO</span>
                                     @elseif($enrollment->status === \App\Models\Student::STATUS_CERTIFICADO)
-                                        <span class="badge rounded-pill badge-status badge-certificado">CONCLUÍDO</span>
+                                    <span class="badge rounded-pill badge-status badge-certificado">CONCLUÍDO</span>
                                     @else
-                                        <span class="badge rounded-pill badge-status badge-pre-inscrito">{{ strtoupper($enrollment->status) }}</span>
+                                    <span class="badge rounded-pill badge-status badge-pre-inscrito">{{ strtoupper($enrollment->status) }}</span>
                                     @endif
                                 </td>
                                 <td class="px-4 py-3 text-end">
                                     @if($enrollment->certificate)
-                                        <a href="{{ route('student.certificates.pdf', $enrollment->certificate) }}" target="_blank" class="btn btn-certificate btn-sm text-white px-3 py-1.5 rounded-3">
-                                            <i class="bi bi-cloud-arrow-down-fill me-1"></i> Baixar PDF
-                                        </a>
+                                    <a href="{{ route('student.certificates.pdf', $enrollment->certificate) }}" target="_blank" class="btn btn-certificate btn-sm text-white px-3 py-1.5 rounded-3">
+                                        <i class="bi bi-cloud-arrow-down-fill me-1"></i> Baixar PDF
+                                    </a>
                                     @elseif($enrollment->status === \App\Models\Student::STATUS_CERTIFICADO)
-                                        <span class="text-soft small"><i class="bi bi-clock me-1"></i> Aguardando emissão</span>
+                                    <span class="text-soft small"><i class="bi bi-clock me-1"></i> Aguardando emissão</span>
                                     @else
-                                        <span class="text-soft small"><i class="bi bi-lock-fill me-1"></i> Não liberado</span>
+                                    <span class="text-soft small"><i class="bi bi-lock-fill me-1"></i> Não liberado</span>
                                     @endif
                                 </td>
                             </tr>

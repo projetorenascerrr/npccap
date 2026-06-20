@@ -57,6 +57,7 @@
     <div class="container py-5">
         <div class="auth-card rounded-4 p-4 p-lg-5 mx-auto" style="max-width: 460px;">
             <div class="text-center mb-4">
+                <img src="{{ asset('images/logo_sejuc.svg') }}" alt="Logo" class="img-fluid" style="height: 32px;">
                 <span class="badge text-bg-danger-subtle text-danger border border-danger-subtle mb-2 px-3 py-2">RECUPERAÇÃO DE SENHA</span>
                 <h1 class="h3 fw-semibold mb-1 text-white">Recuperar Senha</h1>
                 <p class="text-secondary small">Digite seu e-mail administrativo para receber as instruções de recuperação.</p>

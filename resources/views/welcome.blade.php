@@ -85,7 +85,8 @@
             <div class="row align-items-center g-4">
                 <div class="col-lg-8">
                     <a class="text-decoration-none text-reset" href="{{ route('welcome') }}">
-                        <span class="section-title">NPCCAP</span>
+                        <img src="{{ asset('images/logo_sejuc.svg') }}" alt="Logo" class="img-fluid" style="height: 32px;">
+                        <span class="fs-4 section-title text-success">NPCCAP</span>
                         <h1 class="display-5 fw-semibold mt-2 mb-3">Capacitação profissional com foco em resultados reais
                         </h1>
                     </a>

@@ -57,6 +57,7 @@
     <div class="container py-5">
         <div class="auth-card rounded-4 p-4 p-lg-5 mx-auto" style="max-width: 460px;">
             <div class="text-center mb-4">
+                <img src="{{ asset('images/logo_sejuc.svg') }}" alt="Logo" class="img-fluid" style="height: 32px;">
                 <span class="badge text-bg-danger-subtle text-danger border border-danger-subtle mb-2 px-3 py-2">PAINEL ADMINISTRATIVO</span>
                 <h1 class="h3 fw-semibold mb-1 text-white">Login de Admin</h1>
                 <p class="text-secondary small">Acesso restrito para administradores do sistema.</p>

@@ -70,6 +70,7 @@
     <nav class="navbar navbar-expand-lg nav-portal sticky-top py-3">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center gap-2 text-white fw-bold" href="{{ route('student.dashboard') }}">
+                <img src="{{ asset('images/logo_sejuc.svg') }}" alt="Logo" class="img-fluid" style="height: 32px;">
                 <span class="fs-4 tracking-wider text-success">NPCCAP</span>
                 <span class="badge text-bg-success-subtle text-success border border-success-subtle d-none d-sm-inline">Portal do Aluno</span>
             </a>
@@ -176,19 +177,19 @@
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
             const cpfInput = document.getElementById('cpf');
             if (cpfInput) {
-                cpfInput.addEventListener('input', function (e) {
+                cpfInput.addEventListener('input', function(e) {
                     let value = e.target.value;
                     // Remove all non-digit characters
                     value = value.replace(/\D/g, '');
-                    
+
                     // Limit to 11 digits
                     if (value.length > 11) {
                         value = value.slice(0, 11);
                     }
-                    
+
                     // Apply the CPF mask formatting: 000.000.000-00
                     if (value.length > 9) {
                         value = value.replace(/^(\d{3})(\d{3})(\d{3})(\d{1,2})$/, '$1.$2.$3-$4');
@@ -197,7 +198,7 @@
                     } else if (value.length > 3) {
                         value = value.replace(/^(\d{3})(\d{1,3})$/, '$1.$2');
                     }
-                    
+
                     e.target.value = value;
                 });
             }
