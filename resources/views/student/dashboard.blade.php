@@ -153,7 +153,7 @@
             <div class="col-12 col-lg-8">
                 <div class="portal-card rounded-4 p-4 p-lg-5 h-100 d-flex flex-column justify-content-center">
                     <h2 class="display-6 fw-semibold text-white mb-2">Bem-vindo ao seu painel!</h2>
-                    <p class="text-soft fs-5 mb-0">Aqui você pode acompanhar suas turmas, verificar suas notas/frequência e baixar seus certificados de capacitação profissional.</p>
+                    <p class="text-soft fs-5 mb-0">Aqui você pode acompanhar seu curso e baixar seus certificados de capacitação.</p>
                 </div>
             </div>
             <div class="col-12 col-lg-4">

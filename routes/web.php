@@ -39,6 +39,9 @@ Route::middleware('guest:student')->group(function () {
 
 // Admin Guest Routes
 Route::middleware('guest:web')->prefix('admin')->group(function () {
+    Route::get('/', function () {
+        return redirect()->route('home');
+    });
     Route::get('/login', [AuthController::class, 'showLoginForm'])->name('admin.login');
     Route::post('/login', [AuthController::class, 'login'])->name('admin.login.perform');
     Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('admin.register');
