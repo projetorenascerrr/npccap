@@ -64,7 +64,7 @@ class CourseController extends Controller
         unset($validated['image']);
 
         if ($request->hasFile('image_bg')) {
-            $validated['image_bg'] = $request->file('image_bg')->store('courses/backgrounds', 'public');
+            $validated['image_bg'] = $request->file('image_bg')->store('backgrounds', 'public');
         } else {
             unset($validated['image_bg']);
         }
@@ -117,7 +117,7 @@ class CourseController extends Controller
                 Storage::disk('public')->delete($course->image_bg);
             }
 
-            $validated['image_bg'] = $request->file('image_bg')->store('courses/backgrounds', 'public');
+            $validated['image_bg'] = $request->file('image_bg')->store('backgrounds', 'public');
         } else {
             unset($validated['image_bg']);
         }
