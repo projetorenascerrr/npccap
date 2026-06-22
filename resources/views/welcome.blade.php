@@ -103,7 +103,7 @@
                     </div>
                     @elseauth('web')
                     <div class="d-flex gap-2">
-                        <a href="{{ route('courses.index') }}" class="btn btn-danger btn-sm">Painel Admin</a>
+                        <a href="{{ route('courses.index') }}" class="btn btn-danger btn-sm" target="_blank">Painel Admin</a>
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
                             <button type="submit" class="btn btn-outline-light btn-sm">Sair</button>
