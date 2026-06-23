@@ -47,6 +47,8 @@ $linesAss2 = ($signature && !empty($signature->ass2)) ? array_values(array_filte
     <meta charset="UTF-8">
     <title>Certificado</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,100..900;1,100..900&family=Libre+Baskerville:ital,wght@0,400..700;1,400..700&display=swap');
+
         @page {
             size: A4 landscape;
             margin: 0;
@@ -60,15 +62,15 @@ $linesAss2 = ($signature && !empty($signature->ass2)) ? array_values(array_filte
             margin: 0;
             padding: 0;
             background-color: #ffffff;
-            font-family: "Baskerville Old Face", serif;
+            font-family: "Libre Baskerville", serif;
         }
-
+   
         body,
         .certificate,
         .certificate *,
         .certificate-back,
         .certificate-back * {
-            font-family: "Baskerville Old Face", serif !important;
+            font-family: "Libre Baskerville", serif !important;
             color: #2c2a26;
         }
 
@@ -172,46 +174,46 @@ $linesAss2 = ($signature && !empty($signature->ass2)) ? array_values(array_filte
         /* Signatures anchored to bottom of the inner frame */
         .signatures {
             position: absolute;
-            left: 5mm;
-            right: 5mm;
-            bottom: 80mm;
-            padding: 0 16mm;
+            left: 2mm;
+            right: 2mm;
+            bottom: 50mm;
+            padding: 0 0;
             display: table;
-            width: calc(297mm - 10mm - 32mm);
+            width: calc(292mm - 0mm - 0mm);
         }
 
         .signature-box {
             display: table-cell;
-            width: 50%;
+            width: 70%;
             text-align: center;
             vertical-align: top;
         }
 
         .line {
-            width: 80mm;
-            margin: 0 auto 2.5mm;
-            border-top: 0.4mm solid #2c2a26;
+            width: 60mm;
+            margin: 0 auto 2mm;
+            border-top: 0.1mm solid #2c2a26;
         }
 
         .sig-name {
             font-size: 4.6mm;
             font-weight: bold;
-            margin: 0 0 1.5mm 0;
-            line-height: 1.2;
+            margin: 0 0 1mm 0;
+            line-height: 1;
         }
 
         .sig-role {
             font-size: 3.4mm;
             font-weight: normal;
-            margin: 0 0 1mm 0;
-            line-height: 1.2;
+            margin: 0 0 0 0;
+            line-height: 1;
         }
 
         .sig-decree {
             font-size: 3.2mm;
             font-weight: normal;
             margin: 0;
-            line-height: 1.2;
+            line-height: 1;
         }
 
         .qr-area {
@@ -297,7 +299,7 @@ $linesAss2 = ($signature && !empty($signature->ass2)) ? array_values(array_filte
         }
 
         .back-text .url {
-            font-family: "Baskerville Old Face", serif !important;
+            font-family: "Libre Baskerville", serif !important;
             color: #2c2a26;
             text-decoration: none;
         }
@@ -352,7 +354,7 @@ $linesAss2 = ($signature && !empty($signature->ass2)) ? array_values(array_filte
 
         .back-qr-text {
             margin-top: 2.5mm;
-            font-family: "Baskerville Old Face", serif !important;
+            font-family: "Libre Baskerville", serif !important;
             font-size: 2.6mm;
             color: #2c2a26;
         }
