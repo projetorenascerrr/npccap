@@ -35,6 +35,10 @@ $type = pathinfo($starPath, PATHINFO_EXTENSION);
 $data = file_get_contents($starPath);
 $starData = 'data:image/' . $type . ';base64,' . base64_encode($data);
 }
+
+// Parse signatures into lines for individual styling
+$linesAss1 = ($signature && !empty($signature->ass1)) ? array_values(array_filter(array_map('trim', explode("\n", str_replace("\r", "", $signature->ass1))))) : ['Assinatura 1 não configurada.'];
+$linesAss2 = ($signature && !empty($signature->ass2)) ? array_values(array_filter(array_map('trim', explode("\n", str_replace("\r", "", $signature->ass2))))) : ['Assinatura 2 não configurada.'];
 @endphp
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -172,8 +176,6 @@ $starData = 'data:image/' . $type . ';base64,' . base64_encode($data);
             right: 5mm;
             bottom: 80mm;
             padding: 0 16mm;
-            font-size: 4.2mm;
-            white-space: pre-line;
             display: table;
             width: calc(297mm - 10mm - 32mm);
         }
@@ -182,12 +184,34 @@ $starData = 'data:image/' . $type . ';base64,' . base64_encode($data);
             display: table-cell;
             width: 50%;
             text-align: center;
+            vertical-align: top;
         }
 
         .line {
             width: 80mm;
-            margin: 0 auto 2mm;
+            margin: 0 auto 2.5mm;
             border-top: 0.4mm solid #2c2a26;
+        }
+
+        .sig-name {
+            font-size: 4.6mm;
+            font-weight: bold;
+            margin: 0 0 1.5mm 0;
+            line-height: 1.2;
+        }
+
+        .sig-role {
+            font-size: 3.4mm;
+            font-weight: normal;
+            margin: 0 0 1mm 0;
+            line-height: 1.2;
+        }
+
+        .sig-decree {
+            font-size: 3.2mm;
+            font-weight: normal;
+            margin: 0;
+            line-height: 1.2;
         }
 
         .qr-area {
@@ -351,7 +375,7 @@ $starData = 'data:image/' . $type . ';base64,' . base64_encode($data);
 
 <body>
 
-    <!-- First Page (Front / Frente) -->
+    <!-- First Page (Frente) -->
     <div class="page">
         @if ($backgroundPath)
         <div class="bg">
@@ -380,11 +404,27 @@ $starData = 'data:image/' . $type . ';base64,' . base64_encode($data);
             <div class="signatures">
                 <div class="signature-box">
                     <div class="line"></div>
-                    {!! nl2br(e($signature?->ass1 ?: 'Assinatura 1 não configurada.')) !!}
+                    @foreach($linesAss1 as $index => $line)
+                        @if($index === 0)
+                            <div class="sig-name">{{ $line }}</div>
+                        @elseif($index === 1)
+                            <div class="sig-role">{{ $line }}</div>
+                        @else
+                            <div class="sig-decree">{{ $line }}</div>
+                        @endif
+                    @endforeach
                 </div>
                 <div class="signature-box">
                     <div class="line"></div>
-                    {!! nl2br(e($signature?->ass2 ?: 'Assinatura 2 não configurada.')) !!}
+                    @foreach($linesAss2 as $index => $line)
+                        @if($index === 0)
+                            <div class="sig-name">{{ $line }}</div>
+                        @elseif($index === 1)
+                            <div class="sig-role">{{ $line }}</div>
+                        @else
+                            <div class="sig-decree">{{ $line }}</div>
+                        @endif
+                    @endforeach
                 </div>
             </div>
         </div>
@@ -394,7 +434,7 @@ $starData = 'data:image/' . $type . ';base64,' . base64_encode($data);
     <!-- Page Break -->
     <div class="page-break"></div>
 
-    <!-- Second Page (Back / Verso) -->
+    <!-- Second Page (Verso) -->
     <div class="page">
         <div class="certificate-back">
             <div class="back-border">
