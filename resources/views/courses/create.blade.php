@@ -77,6 +77,13 @@
                             <input id="image_bg" name="image_bg" type="file" accept="image/*" class="form-control">
                         </div>
 
+                        <div class="col-12 mt-3">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" role="switch" id="active" name="active" value="1" {{ old('active', true) ? 'checked' : '' }}>
+                                <label class="form-check-label text-white" for="active">Exibir curso na página inicial (Welcome)</label>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
 

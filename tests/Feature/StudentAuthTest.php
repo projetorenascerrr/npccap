@@ -286,5 +286,55 @@ class StudentAuthTest extends TestCase
             ]);
         $response->assertSessionHasErrors(['email']);
     }
+
+    public function test_admin_adding_student_creates_student_user_successfully(): void
+    {
+        // 1. Create a course
+        $course = Course::create([
+            'name' => 'Curso Admin Test',
+            'hours' => 30,
+            'status' => 'ativo',
+        ]);
+
+        // 2. Create an admin user
+        $admin = \App\Models\User::create([
+            'name' => 'Admin User',
+            'email' => 'admin@example.com',
+            'password' => bcrypt('password123'),
+        ]);
+
+        // 3. Make POST to courses.students.store
+        $response = $this->actingAs($admin, 'web')
+            ->post("/admin/courses/{$course->id}/students", [
+                'name' => 'Bob Builder',
+                'cpf' => '555.555.555-55',
+                'email' => 'bob@example.com',
+                'status' => 'inscrito',
+            ]);
+
+        // 4. Assert redirect back to course page
+        $response->assertRedirect("/admin/courses/{$course->id}");
+
+        // 5. Assert database has student user with CPF as password
+        $this->assertDatabaseHas('student_users', [
+            'name' => 'Bob Builder',
+            'cpf' => '555.555.555-55',
+            'email' => 'bob@example.com',
+        ]);
+
+        // 6. Assert student enrollment in course
+        $this->assertDatabaseHas('students', [
+            'course_id' => $course->id,
+            'cpf' => '555.555.555-55',
+            'email' => 'bob@example.com',
+        ]);
+
+        // 7. Verify login using password (which should be numeric digits of CPF: '55555555555')
+        $loginResponse = $this->post('/login', [
+            'cpf' => '555.555.555-55',
+            'password' => '55555555555',
+        ]);
+        $loginResponse->assertRedirect('/student/dashboard');
+    }
 }
 

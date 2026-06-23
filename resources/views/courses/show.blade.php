@@ -9,7 +9,7 @@
         <div class="hero-card rounded-4 p-4 h-100">
             <p class="text-uppercase text-soft small mb-1">Curso</p>
             <h1 class="h3 mb-2">{{ $course->name }}</h1>
-            <p class="text-soft mb-4">Adicione os alunos vinculados a este curso para que eles apareçam no certificado.
+            <p class="text-soft mb-4">Adicione os alunos a este curso.
             </p>
 
             <form method="POST" action="{{ route('courses.students.store', $course) }}" class="row g-3">
@@ -28,7 +28,7 @@
                 <div class="col-12">
                     <label for="email" class="form-label">E-mail</label>
                     <input id="email" name="email" type="email" class="form-control" value="{{ old('email') }}"
-                        placeholder="aluno@exemplo.com">
+                        placeholder="aluno@exemplo.com" required>
                 </div>
 
                 <div class="col-12 col-md-4">
@@ -102,15 +102,15 @@
                             <td>{{ $student->cpf }}</td>
                             <td>
                                 @if ($student->certificate)
-                                    <span class="badge text-bg-success text-uppercase">Emitido</span>
+                                <span class="badge text-bg-success text-uppercase">Emitido</span>
                                 @else
-                                    <form method="POST" action="{{ route('certificates.store') }}">
-                                        @csrf
-                                        <input type="hidden" name="course_id" value="{{ $course->id }}">
-                                        <input type="hidden" name="student_id" value="{{ $student->id }}">
-                                        <input type="hidden" name="issue_date" value="{{ date('Y-m-d') }}">
-                                        <button type="submit" class="btn btn-brand text-white">Emitir Certificado</button>
-                                    </form>
+                                <form method="POST" action="{{ route('certificates.store') }}">
+                                    @csrf
+                                    <input type="hidden" name="course_id" value="{{ $course->id }}">
+                                    <input type="hidden" name="student_id" value="{{ $student->id }}">
+                                    <input type="hidden" name="issue_date" value="{{ date('Y-m-d') }}">
+                                    <button type="submit" class="btn btn-brand text-white">Emitir Certificado</button>
+                                </form>
                                 @endif
                             </td>
                             <td class="text-end">
@@ -119,7 +119,7 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="3" class="text-center text-soft py-4">
+                            <td colspan="4" class="text-center text-soft py-4">
                                 {{ $search !== '' ? 'Nenhum aluno encontrado para a pesquisa.' : 'Nenhum aluno
                                 cadastrado ainda.' }}
                             </td>

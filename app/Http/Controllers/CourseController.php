@@ -51,6 +51,7 @@ class CourseController extends Controller
             'minimum_frequency' => ['nullable', 'numeric', 'min:0', 'max:100'],
             'minimum_grade'     => ['nullable', 'numeric', 'min:0', 'max:10'],
             'status'            => ['nullable', 'in:ativo,encerrado,cancelado'],
+            'active'            => ['nullable', 'boolean'],
             'ass1'              => ['nullable', 'string', 'max:255'],
             'ass2'              => ['nullable', 'string', 'max:255'],
             'image'             => ['nullable', 'image', 'max:5120'],
@@ -68,6 +69,8 @@ class CourseController extends Controller
         } else {
             unset($validated['image_bg']);
         }
+
+        $validated['active'] = $request->boolean('active', true);
 
         $course = Course::create($validated);
 
@@ -96,6 +99,7 @@ class CourseController extends Controller
             'minimum_frequency' => ['nullable', 'numeric', 'min:0', 'max:100'],
             'minimum_grade'     => ['nullable', 'numeric', 'min:0', 'max:10'],
             'status'            => ['nullable', 'in:ativo,encerrado,cancelado'],
+            'active'            => ['nullable', 'boolean'],
             'ass1'              => ['nullable', 'string', 'max:255'],
             'ass2'              => ['nullable', 'string', 'max:255'],
             'image'             => ['nullable', 'image', 'max:5120'],
@@ -121,6 +125,8 @@ class CourseController extends Controller
         } else {
             unset($validated['image_bg']);
         }
+
+        $validated['active'] = $request->boolean('active');
 
         $course->update($validated);
 
@@ -176,19 +182,58 @@ class CourseController extends Controller
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'cpf'   => ['required', 'string', 'regex:/^(\d{11}|\d{3}\.\d{3}\.\d{3}-\d{2})$/'],
-            'email' => ['nullable', 'email', 'max:255'],
+            'email' => ['required', 'email', 'max:255'],
             'frequency' => ['nullable', 'numeric', 'min:0', 'max:100'],
             'grade'     => ['nullable', 'numeric', 'min:0', 'max:10'],
             'status'    => ['nullable', 'in:pre-inscrito,inscrito,confirmado,certificado_emitido'],
         ], [
             'cpf.regex' => 'O CPF deve ter 11 digitos ou estar no formato 000.000.000-00.',
+            'email.required' => 'O e-mail é obrigatório.',
             'email.email' => 'O e-mail deve ter um formato válido.',
         ]);
 
+        $normalizedCpf = $this->normalizeCpf($validated['cpf']);
+
+        // Check if StudentUser already exists with this CPF
+        $studentUser = \App\Models\StudentUser::where('cpf', $normalizedCpf)->first();
+
+        if ($studentUser) {
+            // Check if the email provided is different and already taken by someone else
+            if (strtolower($studentUser->email) !== strtolower($validated['email'])) {
+                $emailTaken = \App\Models\StudentUser::where('email', $validated['email'])
+                    ->where('cpf', '!=', $normalizedCpf)
+                    ->exists();
+
+                if ($emailTaken) {
+                    return back()->withErrors(['email' => 'Este e-mail já está sendo utilizado por outro aluno.'])->withInput();
+                }
+
+                // Update the existing user's email to match the admin input
+                $studentUser->update(['email' => $validated['email']]);
+            }
+        } else {
+            // New user, check if email is already taken
+            $emailTaken = \App\Models\StudentUser::where('email', $validated['email'])->exists();
+
+            if ($emailTaken) {
+                return back()->withErrors(['email' => 'Este e-mail já está sendo utilizado por outro aluno.'])->withInput();
+            }
+
+            // Create StudentUser
+            // Password is the numeric digits of CPF
+            $rawCpfDigits = preg_replace('/\D/', '', $normalizedCpf);
+            \App\Models\StudentUser::create([
+                'name' => $validated['name'],
+                'cpf' => $normalizedCpf,
+                'email' => $validated['email'],
+                'password' => \Illuminate\Support\Facades\Hash::make($rawCpfDigits),
+            ]);
+        }
+
         $course->students()->create([
             'name' => $validated['name'],
-            'cpf' => $this->normalizeCpf($validated['cpf']),
-            'email' => $validated['email'] ?? null,
+            'cpf' => $normalizedCpf,
+            'email' => $validated['email'],
             'frequency' => $validated['frequency'] ?? null,
             'grade' => $validated['grade'] ?? null,
             'status' => $validated['status'] ?? \App\Models\Student::STATUS_INSCRITO,
@@ -196,7 +241,7 @@ class CourseController extends Controller
 
         return redirect()
             ->route('courses.show', $course)
-            ->with('success', 'Aluno adicionado ao curso com sucesso.');
+            ->with('success', 'Aluno adicionado ao curso e cadastrado como usuário com sucesso.');
     }
 
     public function showStudent(Course $course, Student $student)

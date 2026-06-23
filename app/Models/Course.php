@@ -26,6 +26,7 @@ class Course extends Model
         'minimum_frequency',
         'minimum_grade',
         'status',
+        'active',
         'ass1',
         'ass2',
         'image_path',
@@ -39,6 +40,7 @@ class Course extends Model
         'hours'             => 'integer',
         'minimum_frequency' => 'decimal:2',
         'minimum_grade'     => 'decimal:2',
+        'active'            => 'boolean',
     ];
 
     public function students(): HasMany

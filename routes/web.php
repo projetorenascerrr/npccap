@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Auth;
 Route::get('/', function () {
     $courses = Course::query()
         ->where('status', Course::STATUS_ATIVO)
+        ->where('active', true)
         ->orderBy('start_date')
         ->orderBy('name')
         ->get();

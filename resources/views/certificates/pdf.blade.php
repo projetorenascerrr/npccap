@@ -1,3 +1,41 @@
+@php
+// Format date in Portuguese
+$months = [
+1 => 'janeiro', 2 => 'fevereiro', 3 => 'março', 4 => 'abril',
+5 => 'maio', 6 => 'junho', 7 => 'julho', 8 => 'agosto',
+9 => 'setembro', 10 => 'outubro', 11 => 'novembro', 12 => 'dezembro'
+];
+$day = $certificate->issue_date->format('d');
+$month = $months[(int)$certificate->issue_date->format('m')];
+$year = $certificate->issue_date->format('Y');
+$issueDateFormatted = "Boa Vista-RR, {$day} de {$month} de {$year}.";
+
+// Generate deterministic Verificador (8 digits) and CRC (8 hex characters)
+$verificador = str_pad((string)$certificate->id, 8, '0', STR_PAD_LEFT);
+$crc = strtoupper(substr(hash('sha256', 'crc-' . $certificate->id), 0, 8));
+
+// Generate SEI QR Code (svg inline)
+$rawSeiQrCode = SimpleSoftwareIO\QrCode\Facades\QrCode::format('svg')->size(120)->generate('https://sei.rr.gov.br/sei/controlador_externo');
+$seiQrCodeSvg = str_replace('<?xml version="1.0" encoding="UTF-8"?>', '', (string)$rawSeiQrCode);
+
+// Resolve and base64-encode Roraima coat of arms image
+$brasaoPath = public_path('images/brasao_roraima.png');
+$brasaoData = '';
+if (file_exists($brasaoPath)) {
+$type = pathinfo($brasaoPath, PATHINFO_EXTENSION);
+$data = file_get_contents($brasaoPath);
+$brasaoData = 'data:image/' . $type . ';base64,' . base64_encode($data);
+}
+
+// Resolve and base64-encode star image
+$starPath = public_path('images/star.png');
+$starData = '';
+if (file_exists($starPath)) {
+$type = pathinfo($starPath, PATHINFO_EXTENSION);
+$data = file_get_contents($starPath);
+$starData = 'data:image/' . $type . ';base64,' . base64_encode($data);
+}
+@endphp
 <!DOCTYPE html>
 <html lang="pt-BR">
 
@@ -14,19 +52,42 @@
             box-sizing: border-box;
         }
 
-        body,
-        .certificate {
+        body {
             margin: 0;
             padding: 0;
-            width: 297mm;
-            height: 210mm;
+            background-color: #ffffff;
+            font-family: "Baskerville Old Face", serif;
         }
 
         body,
         .certificate,
-        .certificate * {
-            font-family: "Baskerville Old Face", serif;
+        .certificate *,
+        .certificate-back,
+        .certificate-back * {
+            font-family: "Baskerville Old Face", serif !important;
             color: #2c2a26;
+        }
+
+        .page {
+            position: relative;
+            width: 297mm;
+            height: 210mm;
+            overflow: hidden;
+        }
+
+        .page-break {
+            page-break-before: always;
+            height: 0;
+            line-height: 0;
+        }
+
+        /* Front Page Styles */
+        .certificate {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 297mm;
+            height: 210mm;
         }
 
         /* Background image covering the full A4 landscape page */
@@ -53,15 +114,6 @@
             width: 297mm;
             height: 210mm;
             z-index: 1;
-        }
-
-        /* Gold border frame */
-        .certificate {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 297mm;
-            height: 210mm;
         }
 
         .inner {
@@ -118,7 +170,7 @@
             position: absolute;
             left: 5mm;
             right: 5mm;
-            bottom: 8mm;
+            bottom: 80mm;
             padding: 0 16mm;
             font-size: 4.2mm;
             white-space: pre-line;
@@ -153,53 +205,246 @@
             color: #7a5a20;
             letter-spacing: 0.5mm;
         }
+
+        /* Second Page / Verso Styles */
+        .certificate-back {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 297mm;
+            height: 210mm;
+            padding: 0;
+            background-color: #ffffff;
+        }
+
+        .back-border {
+            border: 0.5mm solid #2c2a26;
+            border-radius: 6mm;
+            width: 277mm;
+            height: 190mm;
+            position: absolute;
+            top: 10mm;
+            left: 10mm;
+            padding: 0;
+        }
+
+        .back-left {
+            position: absolute;
+            top: 8mm;
+            left: 10mm;
+            width: 170mm;
+            height: 174mm;
+        }
+
+        .back-divider {
+            position: absolute;
+            top: 8mm;
+            left: 185mm;
+            bottom: 8mm;
+            width: 0.4mm;
+            border-left: 0.4mm solid #2c2a26;
+        }
+
+        .back-right {
+            position: absolute;
+            top: 8mm;
+            left: 190mm;
+            width: 77mm;
+            height: 174mm;
+            text-align: center;
+        }
+
+        .back-title {
+            font-size: 7mm;
+            font-weight: bold;
+            text-decoration: underline;
+            text-align: center;
+            margin-top: 5mm;
+            margin-bottom: 10mm;
+            letter-spacing: 1mm;
+        }
+
+        .back-text {
+            font-size: 4.2mm;
+            line-height: 1.5;
+            text-align: justify;
+            margin-bottom: 12mm;
+            color: #2c2a26;
+        }
+
+        .back-text .url {
+            font-family: "Baskerville Old Face", serif !important;
+            color: #2c2a26;
+            text-decoration: none;
+        }
+
+        .back-info-box {
+            margin-left: 2mm;
+            margin-bottom: 12mm;
+        }
+
+        .back-info-row {
+            font-size: 5mm;
+            font-weight: bold;
+            margin-bottom: 4mm;
+            color: #2c2a26;
+        }
+
+        .back-date {
+            font-size: 5mm;
+            margin-left: 2mm;
+            margin-bottom: 20mm;
+            color: #2c2a26;
+        }
+
+        .back-footer {
+            position: absolute;
+            bottom: 2mm;
+            left: 0;
+            width: 170mm;
+            text-align: center;
+        }
+
+        .back-footer-title {
+            font-size: 3.8mm;
+            font-weight: bold;
+            margin-bottom: 1mm;
+        }
+
+        .back-footer-text {
+            font-size: 2.8mm;
+            line-height: 1.3;
+        }
+
+        /* Right Column Styles */
+        .back-qr-box {
+            margin-top: 15mm;
+            text-align: center;
+        }
+
+        .back-qr-code {
+            text-align: center;
+        }
+
+        .back-qr-text {
+            margin-top: 2.5mm;
+            font-family: "Baskerville Old Face", serif !important;
+            font-size: 2.6mm;
+            color: #2c2a26;
+        }
+
+        .back-brasao-box {
+            position: absolute;
+            bottom: 4mm;
+            left: 0;
+            width: 77mm;
+            text-align: center;
+        }
+
+        .back-brasao-img {
+            width: 45mm;
+            height: auto;
+            display: inline-block;
+        }
     </style>
 </head>
 
 <body>
 
-    @if ($backgroundPath)
-    <div class="bg">
-        <img src="{{ $backgroundPath }}" alt="">
-    </div>
-    <div class="bg-overlay"></div>
-    @endif
+    <!-- First Page (Front / Frente) -->
+    <div class="page">
+        @if ($backgroundPath)
+        <div class="bg">
+            <img src="{{ $backgroundPath }}" alt="">
+        </div>
+        <div class="bg-overlay"></div>
+        @endif
 
-    <div class="certificate">
-        <div class="inner">
-            <p><i>A Secretaria de Estado da Justiça e da Cidadania<br>por intermédio do Núcleo Pedagógico de Capacitação
-                    Continuada, confere a</i></p>
-            <div class="name text-uppercase">{{ $certificate->student_name }}</div>
-            <p>CPF: {{ $certificate->cpf }} concluiu com aproveitamento o curso de:</p>
-            <div class="course">{{ $certificate->course_name }}</div>
+        <div class="certificate">
+            <div class="inner">
+                <p><i>A Secretaria de Estado da Justiça e da Cidadania<br>por intermédio do Núcleo Pedagógico de Capacitação
+                        Continuada, confere a</i></p>
+                <div class="name text-uppercase">{{ $certificate->student_name }}</div>
+                <p>CPF: {{ $certificate->cpf }} concluiu com aproveitamento o curso de:</p>
+                <div class="course">{{ $certificate->course_name }}</div>
 
-            <div class="meta">
-                Emitido em {{ $certificate->issue_date->format('d/m/Y') }}.
+                <div class="meta">
+                    Emitido em {{ $certificate->issue_date->format('d/m/Y') }}.
+                </div>
+
+                @if ($certificate->validation_code)
+                <div class="validation-code">Código: {{ $certificate->validation_code }}</div>
+                @endif
             </div>
 
-            @if ($certificate->validation_code)
-            <div class="validation-code">Código: {{ $certificate->validation_code }}</div>
-            @endif
+            <div class="signatures">
+                <div class="signature-box">
+                    <div class="line"></div>
+                    {!! nl2br(e($signature?->ass1 ?: 'Assinatura 1 não configurada.')) !!}
+                </div>
+                <div class="signature-box">
+                    <div class="line"></div>
+                    {!! nl2br(e($signature?->ass2 ?: 'Assinatura 2 não configurada.')) !!}
+                </div>
+            </div>
         </div>
 
-        <div class="signatures">
-            <div class="signature-box">
-                <div class="line"></div>
-                {!! nl2br(e($signature?->ass1 ?: 'Assinatura 1 não configurada.')) !!}
-            </div>
-            <div class="signature-box">
-                <div class="line"></div>
-                {!! nl2br(e($signature?->ass2 ?: 'Assinatura 2 não configurada.')) !!}
+    </div>
+
+    <!-- Page Break -->
+    <div class="page-break"></div>
+
+    <!-- Second Page (Back / Verso) -->
+    <div class="page">
+        <div class="certificate-back">
+            <div class="back-border">
+                <div class="back-left">
+                    <div class="back-title">REGISTRO</div>
+
+                    <div class="back-text">
+                        Certificado registrado no Núcleo Pedagógico de Capacitação Continuada com
+                        autenticidade podendo ser conferida no endereço
+                        <a href="https://sei.rr.gov.br/autenticar" target="_blank" class="url">https://sei.rr.gov.br/autenticar</a> informando o verificador
+                        <strong>{{ $verificador }}</strong> e o código CRC <strong>{{ $crc }}</strong>.
+                    </div>
+
+                    <div class="back-info-box">
+                        <div class="back-info-row">@if($starData)<img src="{{ $starData }}" alt="" style="vertical-align: middle; height: 4.5mm; width: auto; margin-right: 2mm;">@endif {{ mb_strtoupper($certificate->course_name) }}</div>
+                        <div class="back-info-row">@if($starData)<img src="{{ $starData }}" alt="" style="vertical-align: middle; height: 4.5mm; width: auto; margin-right: 2mm;">@endif Nome: {{ $certificate->student_name }}</div>
+                    </div>
+
+                    <div class="back-date">
+                        {{ $issueDateFormatted }}
+                    </div>
+
+                    <div class="back-footer">
+                        <div class="back-footer-title">Núcleo Pedagógico de Capacitação Continuada - NPCCAP</div>
+                        <div class="back-footer-text">
+                            Av. Getúlio Vargas, 8120 - São Vicente, Boa Vista - Roraima - CEP 69.303-472 - E-mail: npccaprr@gmail.com<br>
+                            Decreto 16.783-E de 17 de março de 2014.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="back-divider"></div>
+
+                <div class="back-right">
+                    <div class="back-qr-box">
+                        <div class="back-qr-code">
+                            {!! $seiQrCodeSvg !!}
+                        </div>
+                        <div class="back-qr-text">sei.rr.gov.br/sei/controlador_externo</div>
+                    </div>
+
+                    @if ($brasaoData)
+                    <div class="back-brasao-box">
+                        <img src="{{ $brasaoData }}" class="back-brasao-img" alt="Brasão de Roraima">
+                    </div>
+                    @endif
+                </div>
             </div>
         </div>
     </div>
-
-    @if (!empty($qrCodeSvg))
-    <div class="qr-area">
-        {!! $qrCodeSvg !!}
-        <div>Validar certificado</div>
-    </div>
-    @endif
 
 </body>
 
