@@ -81,18 +81,20 @@ class StudentPortalController extends Controller
             }
         }
 
-        $qrCodeSvg = $certificate->qr_code;
-        if (! $qrCodeSvg && $certificate->validation_code) {
-            $validationUrl = route('certificates.validate', ['code' => $certificate->validation_code]);
-            $qrCodeSvg     = QrCode::format('svg')->size(150)->generate($validationUrl);
-            $certificate->update(['qr_code' => $qrCodeSvg]);
+        // RN013 – QR Code no PDF (regenera se necessário e passa como SVG Base64 para melhor compatibilidade com DomPDF sem requerer Imagick)
+        $validationUrl = route('certificates.validate', ['code' => $certificate->validation_code]);
+        $qrCodeSvgXml  = QrCode::format('svg')->size(150)->generate($validationUrl);
+        $qrCodeBase64  = 'data:image/svg+xml;base64,' . base64_encode((string)$qrCodeSvgXml);
+
+        if (! $certificate->qr_code && $certificate->validation_code) {
+            $certificate->update(['qr_code' => $qrCodeSvgXml]);
         }
 
         $pdf = Pdf::loadView('certificates.pdf', [
             'certificate'    => $certificate,
             'signature'      => $signature,
             'backgroundPath' => $backgroundPath,
-            'qrCodeSvg'      => $qrCodeSvg,
+            'qrCodeSvg'      => $qrCodeBase64,
         ])->setPaper('a4', 'landscape');
 
         return $pdf->stream('certificado-' . $certificate->validation_code . '.pdf');

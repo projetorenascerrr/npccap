@@ -1,9 +1,9 @@
 @php
 // Format date in Portuguese
 $months = [
-    1 => 'janeiro', 2 => 'fevereiro', 3 => 'março', 4 => 'abril',
-    5 => 'maio', 6 => 'junho', 7 => 'julho', 8 => 'agosto',
-    9 => 'setembro', 10 => 'outubro', 11 => 'novembro', 12 => 'dezembro'
+1 => 'janeiro', 2 => 'fevereiro', 3 => 'março', 4 => 'abril',
+5 => 'maio', 6 => 'junho', 7 => 'julho', 8 => 'agosto',
+9 => 'setembro', 10 => 'outubro', 11 => 'novembro', 12 => 'dezembro'
 ];
 $day = $certificate->issue_date->format('d');
 $month = $months[(int)$certificate->issue_date->format('m')];
@@ -14,50 +14,31 @@ $issueDateFormatted = "Boa Vista-RR, {$day} de {$month} de {$year}.";
 $verificador = $certificate->course->verificador ?? '';
 $crc = $certificate->course->crc ?? '';
 
-// Generate SEI QR Code (svg inline)
+// Generate SEI QR Code (svg base64)
 $rawSeiQrCode = SimpleSoftwareIO\QrCode\Facades\QrCode::format('svg')->size(120)->generate('https://sei.rr.gov.br/sei/controlador_externo.php?acao=documento_conferir&codigo_verificador=' . urlencode($verificador) . '&codigo_crc=' . urlencode($crc) . '&hash_download=230890f57c3f84f81cb3c81ec4365c7e2c6f2b8dd21e889796abc10c7dd37ae12bb8039dcd8ea5400288825eebd46d0febdfe53e13cea2a29b4e63318099df34&visualizacao=1&id_orgao_acesso_externo=0');
-$seiQrCodeSvg = str_replace('<?xml version="1.0" encoding="UTF-8"?>', '', (string)$rawSeiQrCode);
+$seiQrCodeBase64 = 'data:image/svg+xml;base64,' . base64_encode((string)$rawSeiQrCode);
 
 // Resolve and base64-encode Roraima coat of arms image
 $brasaoPath = public_path('images/brasao_roraima.png');
 $brasaoData = '';
 if (file_exists($brasaoPath)) {
-    $type = pathinfo($brasaoPath, PATHINFO_EXTENSION);
-    $data = file_get_contents($brasaoPath);
-    $brasaoData = 'data:image/' . $type . ';base64,' . base64_encode($data);
+$type = pathinfo($brasaoPath, PATHINFO_EXTENSION);
+$data = file_get_contents($brasaoPath);
+$brasaoData = 'data:image/' . $type . ';base64,' . base64_encode($data);
 }
 
 // Resolve and base64-encode star image
 $starPath = public_path('images/star.png');
 $starData = '';
 if (file_exists($starPath)) {
-    $type = pathinfo($starPath, PATHINFO_EXTENSION);
-    $data = file_get_contents($starPath);
-    $starData = 'data:image/' . $type . ';base64,' . base64_encode($data);
+$type = pathinfo($starPath, PATHINFO_EXTENSION);
+$data = file_get_contents($starPath);
+$starData = 'data:image/' . $type . ';base64,' . base64_encode($data);
 }
 
 // Parse signatures into lines for individual styling
 $linesAss1 = ($signature && !empty($signature->ass1)) ? array_values(array_filter(array_map('trim', explode("\n", str_replace("\r", "", $signature->ass1))))) : ['Assinatura 1 não configurada.'];
 $linesAss2 = ($signature && !empty($signature->ass2)) ? array_values(array_filter(array_map('trim', explode("\n", str_replace("\r", "", $signature->ass2))))) : ['Assinatura 2 não configurada.'];
-
-// Force fonts via PHP: fetch Google Fonts CSS, base64-encode the TTFs, and cache it
-$googleFontsCss = Illuminate\Support\Facades\Cache::remember('google_fonts_css_jost_libre_base64', 86400 * 30, function () {
-    $url = 'https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,100..900;1,100..900&family=Libre+Baskerville:ital,wght@0,400..700;1,400..700&display=swap';
-    $css = @file_get_contents($url);
-    if (!$css) {
-        return '';
-    }
-    // Replace TTF URLs with their base64-encoded binary content
-    $css = preg_replace_callback('/url\((https:\/\/[^)]+\.ttf)\)/i', function ($matches) {
-        $fontUrl = $matches[1];
-        $fontData = @file_get_contents($fontUrl);
-        if ($fontData) {
-            return 'url(data:font/truetype;charset=utf-8;base64,' . base64_encode($fontData) . ')';
-        }
-        return $matches[0];
-    }, $css);
-    return $css;
-});
 @endphp
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -65,13 +46,10 @@ $googleFontsCss = Illuminate\Support\Facades\Cache::remember('google_fonts_css_j
 <head>
     <meta charset="UTF-8">
     <title>Certificado</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,100..900;1,100..900&family=Libre+Baskerville:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet">
     <style>
-        @if(!empty($googleFontsCss))
-            {!! $googleFontsCss !!}
-        @else
-            @import url('https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,100..900;1,100..900&family=Libre+Baskerville:ital,wght@0,400..700;1,400..700&display=swap');
-        @endif
-
         @page {
             size: A4 landscape;
             margin: 0;
@@ -87,7 +65,7 @@ $googleFontsCss = Illuminate\Support\Facades\Cache::remember('google_fonts_css_j
             background-color: #ffffff;
             font-family: "Libre Baskerville", serif;
         }
-   
+
         body,
         .certificate,
         .certificate *,
@@ -430,30 +408,37 @@ $googleFontsCss = Illuminate\Support\Facades\Cache::remember('google_fonts_css_j
                 <div class="signature-box">
                     <div class="line"></div>
                     @foreach($linesAss1 as $index => $line)
-                        @if($index === 0)
-                            <div class="sig-name">{{ $line }}</div>
-                        @elseif($index === 1)
-                            <div class="sig-role">{{ $line }}</div>
-                        @else
-                            <div class="sig-decree">{{ $line }}</div>
-                        @endif
+                    @if($index === 0)
+                    <div class="sig-name">{{ $line }}</div>
+                    @elseif($index === 1)
+                    <div class="sig-role">{{ $line }}</div>
+                    @else
+                    <div class="sig-decree">{{ $line }}</div>
+                    @endif
                     @endforeach
                 </div>
                 <div class="signature-box">
                     <div class="line"></div>
                     @foreach($linesAss2 as $index => $line)
-                        @if($index === 0)
-                            <div class="sig-name">{{ $line }}</div>
-                        @elseif($index === 1)
-                            <div class="sig-role">{{ $line }}</div>
-                        @else
-                            <div class="sig-decree">{{ $line }}</div>
-                        @endif
+                    @if($index === 0)
+                    <div class="sig-name">{{ $line }}</div>
+                    @elseif($index === 1)
+                    <div class="sig-role">{{ $line }}</div>
+                    @else
+                    <div class="sig-decree">{{ $line }}</div>
+                    @endif
                     @endforeach
                 </div>
             </div>
         </div>
-
+        <!-- 
+        @if (isset($qrCodeSvg) && $qrCodeSvg)
+        <div class="qr-area">
+            <img src="{{ $qrCodeSvg }}" alt="QR Code de Validação" style="width: 32mm; height: 32mm; display: block; margin: 0 auto 2mm;">
+            <div style="font-weight: bold; text-transform: uppercase; font-size: 2.2mm; letter-spacing: 0.2mm; text-align: center;">Validação</div>
+        </div>
+        @endif
+        -->
     </div>
 
     <!-- Page Break -->
@@ -469,7 +454,7 @@ $googleFontsCss = Illuminate\Support\Facades\Cache::remember('google_fonts_css_j
                     <div class="back-text">
                         Certificado registrado no Núcleo Pedagógico de Capacitação Continuada com
                         autenticidade podendo ser conferida no endereço
-                        <a href="https://sei.rr.gov.br/autenticar" target="_blank" class="url">https://sei.rr.gov.br/autenticar</a> informando o verificador 
+                        <a href="https://sei.rr.gov.br/autenticar" target="_blank" class="url">https://sei.rr.gov.br/autenticar</a> informando o verificador
                         <strong>{{ $verificador }}</strong> e o código CRC <strong>{{ $crc }}</strong>.
                     </div>
 
@@ -496,7 +481,7 @@ $googleFontsCss = Illuminate\Support\Facades\Cache::remember('google_fonts_css_j
                 <div class="back-right">
                     <div class="back-qr-box">
                         <div class="back-qr-code">
-                            {!! $seiQrCodeSvg !!}
+                            <img src="{{ $seiQrCodeBase64 }}" alt="QR Code SEI" style="width: 32mm; height: 32mm;">
                         </div>
                         <div class="back-qr-text">sei.rr.gov.br/sei/controlador_externo</div>
                     </div>
