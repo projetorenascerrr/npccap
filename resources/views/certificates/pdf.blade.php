@@ -1,9 +1,9 @@
 @php
 // Format date in Portuguese
 $months = [
-1 => 'janeiro', 2 => 'fevereiro', 3 => 'março', 4 => 'abril',
-5 => 'maio', 6 => 'junho', 7 => 'julho', 8 => 'agosto',
-9 => 'setembro', 10 => 'outubro', 11 => 'novembro', 12 => 'dezembro'
+    1 => 'janeiro', 2 => 'fevereiro', 3 => 'março', 4 => 'abril',
+    5 => 'maio', 6 => 'junho', 7 => 'julho', 8 => 'agosto',
+    9 => 'setembro', 10 => 'outubro', 11 => 'novembro', 12 => 'dezembro'
 ];
 $day = $certificate->issue_date->format('d');
 $month = $months[(int)$certificate->issue_date->format('m')];
@@ -22,23 +22,42 @@ $seiQrCodeSvg = str_replace('<?xml version="1.0" encoding="UTF-8"?>', '', (strin
 $brasaoPath = public_path('images/brasao_roraima.png');
 $brasaoData = '';
 if (file_exists($brasaoPath)) {
-$type = pathinfo($brasaoPath, PATHINFO_EXTENSION);
-$data = file_get_contents($brasaoPath);
-$brasaoData = 'data:image/' . $type . ';base64,' . base64_encode($data);
+    $type = pathinfo($brasaoPath, PATHINFO_EXTENSION);
+    $data = file_get_contents($brasaoPath);
+    $brasaoData = 'data:image/' . $type . ';base64,' . base64_encode($data);
 }
 
 // Resolve and base64-encode star image
 $starPath = public_path('images/star.png');
 $starData = '';
 if (file_exists($starPath)) {
-$type = pathinfo($starPath, PATHINFO_EXTENSION);
-$data = file_get_contents($starPath);
-$starData = 'data:image/' . $type . ';base64,' . base64_encode($data);
+    $type = pathinfo($starPath, PATHINFO_EXTENSION);
+    $data = file_get_contents($starPath);
+    $starData = 'data:image/' . $type . ';base64,' . base64_encode($data);
 }
 
 // Parse signatures into lines for individual styling
 $linesAss1 = ($signature && !empty($signature->ass1)) ? array_values(array_filter(array_map('trim', explode("\n", str_replace("\r", "", $signature->ass1))))) : ['Assinatura 1 não configurada.'];
 $linesAss2 = ($signature && !empty($signature->ass2)) ? array_values(array_filter(array_map('trim', explode("\n", str_replace("\r", "", $signature->ass2))))) : ['Assinatura 2 não configurada.'];
+
+// Force fonts via PHP: fetch Google Fonts CSS, base64-encode the TTFs, and cache it
+$googleFontsCss = Illuminate\Support\Facades\Cache::remember('google_fonts_css_jost_libre_base64', 86400 * 30, function () {
+    $url = 'https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,100..900;1,100..900&family=Libre+Baskerville:ital,wght@0,400..700;1,400..700&display=swap';
+    $css = @file_get_contents($url);
+    if (!$css) {
+        return '';
+    }
+    // Replace TTF URLs with their base64-encoded binary content
+    $css = preg_replace_callback('/url\((https:\/\/[^)]+\.ttf)\)/i', function ($matches) {
+        $fontUrl = $matches[1];
+        $fontData = @file_get_contents($fontUrl);
+        if ($fontData) {
+            return 'url(data:font/truetype;charset=utf-8;base64,' . base64_encode($fontData) . ')';
+        }
+        return $matches[0];
+    }, $css);
+    return $css;
+});
 @endphp
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -47,7 +66,11 @@ $linesAss2 = ($signature && !empty($signature->ass2)) ? array_values(array_filte
     <meta charset="UTF-8">
     <title>Certificado</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,100..900;1,100..900&family=Libre+Baskerville:ital,wght@0,400..700;1,400..700&display=swap');
+        @if(!empty($googleFontsCss))
+            {!! $googleFontsCss !!}
+        @else
+            @import url('https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,100..900;1,100..900&family=Libre+Baskerville:ital,wght@0,400..700;1,400..700&display=swap');
+        @endif
 
         @page {
             size: A4 landscape;
