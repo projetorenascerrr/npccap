@@ -198,14 +198,14 @@ $linesAss2 = ($signature && !empty($signature->ass2)) ? array_values(array_filte
         .sig-name {
             font-size: 4.6mm;
             font-weight: bold;
-            margin: 0 0 1mm 0;
+            margin: 0 0 1 0;
             line-height: 1;
         }
 
         .sig-role {
             font-size: 3.4mm;
             font-weight: normal;
-            margin: 0 0 0 0;
+            margin: 0 0 1 0;
             line-height: 1;
         }
 
