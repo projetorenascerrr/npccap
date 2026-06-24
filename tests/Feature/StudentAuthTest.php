@@ -336,5 +336,76 @@ class StudentAuthTest extends TestCase
         ]);
         $loginResponse->assertRedirect('/student/dashboard');
     }
+
+    public function test_course_verificador_and_crc_flow(): void
+    {
+        // 1. Create admin user
+        $admin = \App\Models\User::create([
+            'name' => 'Admin User',
+            'email' => 'admin_test@example.com',
+            'password' => bcrypt('password123'),
+        ]);
+
+        // 2. Post to create a course with verificador and crc
+        $response = $this->actingAs($admin, 'web')
+            ->post('/admin/courses', [
+                'name' => 'Course V-CRC Test',
+                'description' => 'Test course description',
+                'hours' => 20,
+                'status' => 'ativo',
+                'verificador' => '12345678',
+                'crc' => 'ABCDEF12',
+            ]);
+
+        $course = Course::where('name', 'Course V-CRC Test')->firstOrFail();
+        $this->assertEquals('12345678', $course->verificador);
+        $this->assertEquals('ABCDEF12', $course->crc);
+
+        // 3. Put to update the course verificador and crc
+        $response = $this->actingAs($admin, 'web')
+            ->put("/admin/courses/{$course->id}", [
+                'name' => 'Course V-CRC Test Updated',
+                'description' => 'Test course description',
+                'hours' => 20,
+                'status' => 'ativo',
+                'verificador' => '87654321',
+                'crc' => 'FEDCBA98',
+            ]);
+
+        $course->refresh();
+        $this->assertEquals('87654321', $course->verificador);
+        $this->assertEquals('FEDCBA98', $course->crc);
+
+        // 4. Create student and certificate to test PDF rendering view variables
+        $student = Student::create([
+            'course_id' => $course->id,
+            'name' => 'Test Student',
+            'cpf' => '000.111.222-33',
+            'email' => 'student_test@example.com',
+            'status' => 'confirmado',
+        ]);
+
+        $certificate = \App\Models\Certificate::create([
+            'course_id' => $course->id,
+            'student_id' => $student->id,
+            'student_name' => $student->name,
+            'cpf' => $student->cpf,
+            'course_name' => $course->name,
+            'issue_date' => now(),
+            'validation_code' => 'CERT-2026-999999',
+        ]);
+
+        // Access the PDF rendering view and assert variables are populated from the course
+        $pdfView = view('certificates.pdf', [
+            'certificate' => $certificate,
+            'signature' => null,
+            'backgroundPath' => null,
+            'qrCodeSvg' => '',
+        ])->render();
+
+        $this->assertStringContainsString('87654321', $pdfView);
+        $this->assertStringContainsString('FEDCBA98', $pdfView);
+    }
 }
+
 

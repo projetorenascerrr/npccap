@@ -113,7 +113,17 @@
                             @endif
                         </div>
 
+                        <div class="col-md-6">
+                            <label for="verificador" class="form-label">VERIFICADOR</label>
+                            <input id="verificador" name="verificador" type="text"
+                                class="form-control" value="{{ old('verificador', $course->verificador) }}">
+                        </div>
 
+                        <div class="col-md-6">
+                            <label for="crc" class="form-label">CRC</label>
+                            <input id="crc" name="crc" type="text"
+                                class="form-control" value="{{ old('crc', $course->crc) }}">
+                        </div>
 
                     </div>
                 </div>

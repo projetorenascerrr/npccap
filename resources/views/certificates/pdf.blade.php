@@ -10,12 +10,12 @@ $month = $months[(int)$certificate->issue_date->format('m')];
 $year = $certificate->issue_date->format('Y');
 $issueDateFormatted = "Boa Vista-RR, {$day} de {$month} de {$year}.";
 
-// Generate deterministic Verificador (8 digits) and CRC (8 hex characters)
-$verificador = str_pad((string)$certificate->id, 8, '0', STR_PAD_LEFT);
-$crc = strtoupper(substr(hash('sha256', 'crc-' . $certificate->id), 0, 8));
+// Retrieve Verificador and CRC from the associated course
+$verificador = $certificate->course->verificador ?? '';
+$crc = $certificate->course->crc ?? '';
 
 // Generate SEI QR Code (svg inline)
-$rawSeiQrCode = SimpleSoftwareIO\QrCode\Facades\QrCode::format('svg')->size(120)->generate('https://sei.rr.gov.br/sei/controlador_externo');
+$rawSeiQrCode = SimpleSoftwareIO\QrCode\Facades\QrCode::format('svg')->size(120)->generate('https://sei.rr.gov.br/sei/controlador_externo.php?acao=documento_conferir&codigo_verificador=' . urlencode($verificador) . '&codigo_crc=' . urlencode($crc) . '&hash_download=230890f57c3f84f81cb3c81ec4365c7e2c6f2b8dd21e889796abc10c7dd37ae12bb8039dcd8ea5400288825eebd46d0febdfe53e13cea2a29b4e63318099df34&visualizacao=1&id_orgao_acesso_externo=0');
 $seiQrCodeSvg = str_replace('<?xml version="1.0" encoding="UTF-8"?>', '', (string)$rawSeiQrCode);
 
 // Resolve and base64-encode Roraima coat of arms image
@@ -246,11 +246,11 @@ $linesAss2 = ($signature && !empty($signature->ass2)) ? array_values(array_filte
         .back-border {
             border: 0.5mm solid #2c2a26;
             border-radius: 6mm;
-            width: 277mm;
-            height: 190mm;
+            width: 260mm;
+            height: 150mm;
             position: absolute;
-            top: 10mm;
-            left: 10mm;
+            top: 28mm;
+            left: 18mm;
             padding: 0;
         }
 
@@ -274,7 +274,7 @@ $linesAss2 = ($signature && !empty($signature->ass2)) ? array_values(array_filte
         .back-right {
             position: absolute;
             top: 8mm;
-            left: 190mm;
+            left: 185mm;
             width: 77mm;
             height: 174mm;
             text-align: center;
@@ -325,7 +325,7 @@ $linesAss2 = ($signature && !empty($signature->ass2)) ? array_values(array_filte
 
         .back-footer {
             position: absolute;
-            bottom: 2mm;
+            bottom: 40mm;
             left: 0;
             width: 170mm;
             text-align: center;
@@ -361,14 +361,14 @@ $linesAss2 = ($signature && !empty($signature->ass2)) ? array_values(array_filte
 
         .back-brasao-box {
             position: absolute;
-            bottom: 4mm;
+            bottom: 45mm;
             left: 0;
             width: 77mm;
             text-align: center;
         }
 
         .back-brasao-img {
-            width: 45mm;
+            width: 40mm;
             height: auto;
             display: inline-block;
         }
@@ -446,7 +446,7 @@ $linesAss2 = ($signature && !empty($signature->ass2)) ? array_values(array_filte
                     <div class="back-text">
                         Certificado registrado no Núcleo Pedagógico de Capacitação Continuada com
                         autenticidade podendo ser conferida no endereço
-                        <a href="https://sei.rr.gov.br/autenticar" target="_blank" class="url">https://sei.rr.gov.br/autenticar</a> informando o verificador
+                        <a href="https://sei.rr.gov.br/autenticar" target="_blank" class="url">https://sei.rr.gov.br/autenticar</a> informando o verificador 
                         <strong>{{ $verificador }}</strong> e o código CRC <strong>{{ $crc }}</strong>.
                     </div>
 

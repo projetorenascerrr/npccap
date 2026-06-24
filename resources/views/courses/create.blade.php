@@ -30,6 +30,14 @@
                             <textarea id="description" name="description" class="form-control"
                                 rows="4">{{ old('description') }}</textarea>
                         </div>
+
+                        <div class="col-12 mt-3">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" role="switch" id="active" name="active" value="1" {{ old('active', true) ? 'checked' : '' }}>
+                                <label class="form-check-label text-white" for="active">Exibir curso na página inicial</label>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
 
@@ -77,11 +85,16 @@
                             <input id="image_bg" name="image_bg" type="file" accept="image/*" class="form-control">
                         </div>
 
-                        <div class="col-12 mt-3">
-                            <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" role="switch" id="active" name="active" value="1" {{ old('active', true) ? 'checked' : '' }}>
-                                <label class="form-check-label text-white" for="active">Exibir curso na página inicial (Welcome)</label>
-                            </div>
+                        <div class="col-md-6">
+                            <label for="verificador" class="form-label">VERIFICADOR</label>
+                            <input id="verificador" name="verificador" type="text"
+                                class="form-control" value="{{ old('verificador') }}">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="crc" class="form-label">CRC</label>
+                            <input id="crc" name="crc" type="text"
+                                class="form-control" value="{{ old('crc') }}">
                         </div>
 
                     </div>

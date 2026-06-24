@@ -56,6 +56,8 @@ class CourseController extends Controller
             'ass2'              => ['nullable', 'string', 'max:255'],
             'image'             => ['nullable', 'image', 'max:5120'],
             'image_bg'          => ['nullable', 'image', 'max:5120'],
+            'verificador'       => ['nullable', 'string', 'max:255'],
+            'crc'               => ['nullable', 'string', 'max:255'],
         ]);
 
         if ($request->hasFile('image')) {
@@ -104,6 +106,8 @@ class CourseController extends Controller
             'ass2'              => ['nullable', 'string', 'max:255'],
             'image'             => ['nullable', 'image', 'max:5120'],
             'image_bg'          => ['nullable', 'image', 'max:5120'],
+            'verificador'       => ['nullable', 'string', 'max:255'],
+            'crc'               => ['nullable', 'string', 'max:255'],
         ]);
 
         if ($request->hasFile('image')) {

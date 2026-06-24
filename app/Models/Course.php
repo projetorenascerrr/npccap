@@ -31,6 +31,8 @@ class Course extends Model
         'ass2',
         'image_path',
         'image_bg',
+        'verificador',
+        'crc',
     ];
 
     protected $casts = [
