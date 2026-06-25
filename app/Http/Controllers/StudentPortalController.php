@@ -72,8 +72,8 @@ class StudentPortalController extends Controller
         $certificate->loadMissing('course');
 
         $backgroundPath = null;
-        if ($certificate->course && $certificate->course->image_path) {
-            $path = storage_path('app/public/' . $certificate->course->image_path);
+        if ($certificate->course && $certificate->course->image_bg) {
+            $path = storage_path('app/public/' . $certificate->course->image_bg);
             if (file_exists($path)) {
                 $type           = pathinfo($path, PATHINFO_EXTENSION);
                 $data           = file_get_contents($path);
