@@ -34,6 +34,13 @@
             border-top-left-radius: 1rem;
             border-top-right-radius: 1rem;
             display: block;
+            cursor: pointer;
+            transition: transform 0.2s ease-in-out, filter 0.2s ease-in-out;
+        }
+
+        .course-image:hover {
+            transform: scale(1.02);
+            filter: brightness(1.1);
         }
 
         .course-placeholder {
@@ -142,7 +149,11 @@
                     <article class="course-card rounded-4 h-100 overflow-hidden">
                         @if($course->image_path)
                         <img class="course-image" src="{{ asset('storage/' . $course->image_path) }}"
-                            alt="Imagem do curso {{ $course->name }}">
+                            alt="Imagem do curso {{ $course->name }}"
+                            data-bs-toggle="modal"
+                            data-bs-target="#imageModal"
+                            data-bs-image="{{ asset('storage/' . $course->image_path) }}"
+                            data-bs-title="{{ $course->name }}">
                         @else
                         <div class="course-placeholder d-flex align-items-center justify-content-center">
                             <i class="bi bi-mortarboard-fill fs-1 text-white"></i>
@@ -195,6 +206,37 @@
             @endif
         </section>
     </div>
+
+    <!-- Modal para ampliar a imagem do curso -->
+    <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content bg-transparent border-0 position-relative">
+                <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-3" data-bs-dismiss="modal" aria-label="Close" style="z-index: 1055; filter: drop-shadow(0px 2px 4px rgba(0,0,0,0.8));"></button>
+                <div class="modal-body p-0 text-center">
+                    <img id="modalImage" src="" class="img-fluid rounded-3 shadow-lg" alt="Imagem do curso ampliada" style="max-height: 85vh; object-fit: contain;">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const imageModal = document.getElementById('imageModal');
+            if (imageModal) {
+                imageModal.addEventListener('show.bs.modal', function (event) {
+                    const triggerElement = event.relatedTarget;
+                    const imageSrc = triggerElement.getAttribute('data-bs-image');
+                    const imageTitle = triggerElement.getAttribute('data-bs-title');
+                    
+                    const modalImage = imageModal.querySelector('#modalImage');
+                    if (modalImage) {
+                        modalImage.src = imageSrc;
+                        modalImage.alt = 'Imagem do curso ' + imageTitle;
+                    }
+                });
+            }
+        });
+    </script>
 </body>
 
 </html>
