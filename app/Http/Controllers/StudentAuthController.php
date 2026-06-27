@@ -115,16 +115,13 @@ class StudentAuthController extends Controller
         if ($course) {
             // Check if enrollment already exists in the students table
             $exists = Student::where('course_id', $courseId)
-                ->where('cpf', $user->cpf)
+                ->where('student_user_id', $user->id)
                 ->exists();
 
             if (!$exists) {
                 Student::create([
                     'course_id' => $course->id,
-                    'name' => $user->name,
-                    'cpf' => $user->cpf,
-                    'email' => $user->email,
-                    'birth_date' => $user->birth_date,
+                    'student_user_id' => $user->id,
                     'status' => Student::STATUS_INSCRITO,
                 ]);
             }

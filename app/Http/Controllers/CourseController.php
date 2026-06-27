@@ -18,8 +18,8 @@ class CourseController extends Controller
             ->when($search !== '', function ($query) use ($search) {
                 $query->where(function ($innerQuery) use ($search) {
                     $innerQuery->where('name', 'like', "%{$search}%")
-                        ->orWhereHas('students', function ($studentsQuery) use ($search) {
-                            $studentsQuery->where('name', 'like', "%{$search}%")
+                        ->orWhereHas('students.studentUser', function ($studentUserQuery) use ($search) {
+                            $studentUserQuery->where('name', 'like', "%{$search}%")
                                 ->orWhere('cpf', 'like', "%{$search}%");
                         });
                 });
@@ -235,9 +235,7 @@ class CourseController extends Controller
         }
 
         $course->students()->create([
-            'name' => $validated['name'],
-            'cpf' => $normalizedCpf,
-            'email' => $validated['email'],
+            'student_user_id' => $studentUser->id,
             'frequency' => $validated['frequency'] ?? null,
             'grade' => $validated['grade'] ?? null,
             'status' => $validated['status'] ?? \App\Models\Student::STATUS_INSCRITO,
@@ -283,10 +281,29 @@ class CourseController extends Controller
             'cpf.regex' => 'O CPF deve ter 11 digitos ou estar no formato 000.000.000-00.',
         ]);
 
+        $normalizedCpf = $this->normalizeCpf($validated['cpf']);
+
+        // 1. Update corresponding StudentUser
+        $studentUser = $student->studentUser;
+        if ($studentUser) {
+            $oldCpf = $studentUser->cpf;
+            $studentUser->update([
+                'name' => $validated['name'],
+                'cpf' => $normalizedCpf,
+                'email' => $validated['email'] ?? $studentUser->email,
+            ]);
+
+            // 2. If CPF changed, update existing certificates for integrity
+            if ($oldCpf !== $normalizedCpf) {
+                \App\Models\Certificate::where('cpf', $oldCpf)->update([
+                    'cpf' => $normalizedCpf,
+                    'student_name' => $validated['name'],
+                ]);
+            }
+        }
+
+        // 3. Update student enrollment details
         $student->update([
-            'name'      => $validated['name'],
-            'cpf'       => $this->normalizeCpf($validated['cpf']),
-            'email'     => $validated['email'] ?? $student->email,
             'frequency' => $validated['frequency'] ?? $student->frequency,
             'grade'     => $validated['grade'] ?? $student->grade,
             'status'    => $validated['status'] ?? $student->status,

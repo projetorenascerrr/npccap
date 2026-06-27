@@ -19,6 +19,9 @@ return new class extends Migration
             $table->string('cpf', 14);
             $table->string('course_name');
             $table->date('issue_date');
+            $table->string('validation_code', 20)->unique()->nullable()->comment('Código único ex: CERT-2026-000001');
+            $table->text('qr_code')->nullable()->comment('Conteúdo SVG/PNG do QR Code');
+            $table->unsignedSmallInteger('reissue_count')->default(0);
             $table->timestamps();
         });
     }

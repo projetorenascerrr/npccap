@@ -74,10 +74,12 @@ class StudentAuthTest extends TestCase
             'cpf' => '987.654.321-11',
         ]);
 
+        $studentUser = StudentUser::where('cpf', '987.654.321-11')->firstOrFail();
+
         // Check if student enrollment record was created
         $this->assertDatabaseHas('students', [
             'course_id' => $course->id,
-            'cpf' => '987.654.321-11',
+            'student_user_id' => $studentUser->id,
             'status' => 'inscrito',
         ]);
     }
@@ -202,9 +204,7 @@ class StudentAuthTest extends TestCase
 
         $student = Student::create([
             'course_id' => $course->id,
-            'name' => 'John Doe',
-            'cpf' => '123.456.789-00',
-            'email' => 'john@example.com',
+            'student_user_id' => $studentUser->id,
             'status' => 'inscrito',
         ]);
 
@@ -236,12 +236,14 @@ class StudentAuthTest extends TestCase
             'email' => 'john.changed@example.com',
         ]);
 
-        // Check if student enrollment record updated
+        // Check if student enrollment has correct relationship and dynamically returns correct name/cpf/email
+        $student->refresh();
+        $this->assertEquals('John Changed', $student->name);
+        $this->assertEquals('987.654.321-99', $student->cpf);
+        $this->assertEquals('john.changed@example.com', $student->email);
         $this->assertDatabaseHas('students', [
             'id' => $student->id,
-            'name' => 'John Changed',
-            'cpf' => '987.654.321-99',
-            'email' => 'john.changed@example.com',
+            'student_user_id' => $studentUser->id,
         ]);
 
         // Check if certificate updated
@@ -322,11 +324,12 @@ class StudentAuthTest extends TestCase
             'email' => 'bob@example.com',
         ]);
 
+        $studentUser = StudentUser::where('cpf', '555.555.555-55')->firstOrFail();
+
         // 6. Assert student enrollment in course
         $this->assertDatabaseHas('students', [
             'course_id' => $course->id,
-            'cpf' => '555.555.555-55',
-            'email' => 'bob@example.com',
+            'student_user_id' => $studentUser->id,
         ]);
 
         // 7. Verify login using password (which should be numeric digits of CPF: '55555555555')
@@ -376,12 +379,17 @@ class StudentAuthTest extends TestCase
         $this->assertEquals('87654321', $course->verificador);
         $this->assertEquals('FEDCBA98', $course->crc);
 
-        // 4. Create student and certificate to test PDF rendering view variables
-        $student = Student::create([
-            'course_id' => $course->id,
+        $studentUser = StudentUser::create([
             'name' => 'Test Student',
             'cpf' => '000.111.222-33',
             'email' => 'student_test@example.com',
+            'password' => bcrypt('password123'),
+        ]);
+
+        // 4. Create student and certificate to test PDF rendering view variables
+        $student = Student::create([
+            'course_id' => $course->id,
+            'student_user_id' => $studentUser->id,
             'status' => 'confirmado',
         ]);
 

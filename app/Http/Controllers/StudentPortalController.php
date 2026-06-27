@@ -18,10 +18,9 @@ class StudentPortalController extends Controller
     public function index()
     {
         $studentUser = Auth::guard('student')->user();
-        $cpf = $studentUser->cpf;
 
-        // Fetch all course enrollments for this student (based on CPF)
-        $enrollments = Student::where('cpf', $cpf)
+        // Fetch all course enrollments for this student (based on student_user_id)
+        $enrollments = Student::where('student_user_id', $studentUser->id)
             ->with(['course', 'certificates'])
             ->get();
 
@@ -37,7 +36,7 @@ class StudentPortalController extends Controller
 
         // Check if already enrolled in this course
         $exists = Student::where('course_id', $course->id)
-            ->where('cpf', $studentUser->cpf)
+            ->where('student_user_id', $studentUser->id)
             ->exists();
 
         if (!$exists) {
@@ -48,10 +47,7 @@ class StudentPortalController extends Controller
 
             Student::create([
                 'course_id' => $course->id,
-                'name' => $studentUser->name,
-                'cpf' => $studentUser->cpf,
-                'email' => $studentUser->email,
-                'birth_date' => $studentUser->birth_date,
+                'student_user_id' => $studentUser->id,
                 'status' => Student::STATUS_INSCRITO,
             ]);
 
@@ -150,15 +146,8 @@ class StudentPortalController extends Controller
 
         $studentUser->save();
 
-        // Sync updates to students & certificates tables for integrity
-        // 1. Update students table
-        Student::where('cpf', $oldCpf)->update([
-            'cpf' => $newCpf,
-            'name' => $newName,
-            'email' => $newEmail,
-        ]);
-
-        // 2. Update certificates table
+        // Sync updates to certificates tables for integrity (students table gets name/cpf/email dynamically via relationship)
+        // Update certificates table (copy-carbon/audit logs)
         \App\Models\Certificate::where('cpf', $oldCpf)->update([
             'cpf' => $newCpf,
             'student_name' => $newName,

@@ -18,10 +18,7 @@ class Student extends Model
 
     protected $fillable = [
         'course_id',
-        'name',
-        'cpf',
-        'email',
-        'birth_date',
+        'student_user_id',
         'status',
         'frequency',
         'grade',
@@ -29,7 +26,6 @@ class Student extends Model
     ];
 
     protected $casts = [
-        'birth_date'  => 'date',
         'approved_at' => 'datetime',
         'frequency'   => 'decimal:2',
         'grade'       => 'decimal:2',
@@ -38,6 +34,31 @@ class Student extends Model
     public function course(): BelongsTo
     {
         return $this->belongsTo(Course::class);
+    }
+
+    public function studentUser(): BelongsTo
+    {
+        return $this->belongsTo(StudentUser::class, 'student_user_id');
+    }
+
+    public function getNameAttribute()
+    {
+        return $this->studentUser ? $this->studentUser->name : null;
+    }
+
+    public function getCpfAttribute()
+    {
+        return $this->studentUser ? $this->studentUser->cpf : null;
+    }
+
+    public function getEmailAttribute()
+    {
+        return $this->studentUser ? $this->studentUser->email : null;
+    }
+
+    public function getBirthDateAttribute()
+    {
+        return $this->studentUser ? $this->studentUser->birth_date : null;
     }
 
     public function certificates(): HasMany
@@ -60,12 +81,32 @@ class Student extends Model
             return false;
         }
 
+        // Validação de frequência mínima se configurada no curso
+        if ($course->minimum_frequency !== null) {
+            if ($this->frequency === null || $this->frequency < $course->minimum_frequency) {
+                return false;
+            }
+        }
+
+        // Validação de nota mínima se configurada no curso
+        if ($course->minimum_grade !== null) {
+            if ($this->grade === null || $this->grade < $course->minimum_grade) {
+                return false;
+            }
+        }
+
         return true;
     }
 
     // RN011 – Elegibilidade para emissão de certificado
     public function canIssueCertificate(): bool
     {
+        $course = $this->relationLoaded('course') ? $this->course : $this->course()->first();
+
+        if (! $course || ! $course->isEncerrado()) {
+            return false;
+        }
+
         return $this->isApproved();
     }
 }

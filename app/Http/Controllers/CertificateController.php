@@ -84,9 +84,12 @@ class CertificateController extends Controller
 
         // RN011 – Elegibilidade
         if (! $student->canIssueCertificate()) {
-            $reason = ! $student->isApproved()
-                ? 'O aluno não está apto para emissão no momento.'
-                : 'O cadastro do aluno está incompleto ou o aluno é pré-inscrito.';
+            $reason = 'O aluno não está apto para emissão no momento.';
+            if (!$course->isEncerrado()) {
+                $reason = 'O curso deve estar encerrado para que certificados possam ser emitidos.';
+            } elseif (!$student->isApproved()) {
+                $reason = 'O aluno não atingiu os critérios mínimos de aprovação (nota/frequência).';
+            }
 
             return back()->withErrors(['student_id' => $reason])->withInput();
         }
