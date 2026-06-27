@@ -449,6 +449,62 @@ class StudentAuthTest extends TestCase
         $responseSearch->assertStatus(200);
         $responseSearch->assertSee('Aluno Teste Especial');
     }
+
+    public function test_admin_can_access_edit_student_page_and_update()
+    {
+        $admin = \App\Models\User::factory()->create();
+
+        $studentUser = StudentUser::create([
+            'name' => 'Aluno Edicao',
+            'cpf' => '123.456.789-02',
+            'email' => 'edicao@exemplo.com',
+            'password' => bcrypt('password123'),
+        ]);
+
+        $course = Course::create([
+            'name' => 'Curso de Teste',
+            'status' => 'ativo',
+        ]);
+
+        $student = Student::create([
+            'course_id' => $course->id,
+            'student_user_id' => $studentUser->id,
+            'status' => 'inscrito',
+        ]);
+
+        $this->actingAs($admin, 'web');
+
+        // 1. GET edit page
+        $response = $this->get("/admin/courses/{$course->id}/students/{$student->id}/edit");
+        $response->assertStatus(200);
+        $response->assertSee('Editar aluno');
+
+        // 2. PUT update student
+        $responseUpdate = $this->put("/admin/courses/{$course->id}/students/{$student->id}", [
+            'name' => 'Aluno Editado Nome',
+            'cpf' => '123.456.789-02',
+            'email' => 'editado@exemplo.com',
+            'frequency' => 85.5,
+            'grade' => 7.5,
+            'status' => 'confirmado',
+        ]);
+
+        $responseUpdate->assertRedirect(route('courses.show', $course));
+
+        // Assert updated in Database
+        $this->assertDatabaseHas('student_users', [
+            'id' => $studentUser->id,
+            'name' => 'Aluno Editado Nome',
+            'email' => 'editado@exemplo.com',
+        ]);
+
+        $this->assertDatabaseHas('students', [
+            'id' => $student->id,
+            'frequency' => 85.5,
+            'grade' => 7.5,
+            'status' => 'confirmado',
+        ]);
+    }
 }
 
 
