@@ -314,6 +314,21 @@ class CourseController extends Controller
             ->with('success', 'Aluno atualizado com sucesso.');
     }
 
+    public function destroyStudent(Course $course, Student $student)
+    {
+        abort_unless($student->course_id === $course->id, 404);
+
+        if ($student->certificates()->exists()) {
+            return back()->with('error', 'Não é possível remover o aluno pois ele possui certificados associados.');
+        }
+
+        $student->delete();
+
+        return redirect()
+            ->route('courses.show', $course)
+            ->with('success', 'Aluno removido do curso com sucesso.');
+    }
+
     private function normalizeCpf(string $cpf): string
     {
         $onlyNumbers = preg_replace('/\D/', '', $cpf) ?? '';

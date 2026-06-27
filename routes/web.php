@@ -78,6 +78,7 @@ Route::middleware('auth:student')->prefix('student')->group(function () {
     Route::get('/certificates/{certificate}/pdf', [StudentPortalController::class, 'downloadCertificate'])->name('student.certificates.pdf');
     Route::get('/profile', [StudentPortalController::class, 'editProfile'])->name('student.profile.edit');
     Route::put('/profile', [StudentPortalController::class, 'updateProfile'])->name('student.profile.update');
+    Route::delete('/enrollments/{student}/cancel', [StudentPortalController::class, 'cancelEnrollment'])->name('student.enrollment.cancel');
 });
 
 // Admin Authenticated Routes
@@ -105,5 +106,6 @@ Route::middleware('auth:web')->prefix('admin')->group(function () {
     Route::post('/signature', [SignatureController::class, 'store'])->name('signature.store');
 
     Route::get('/students', [StudentController::class, 'index'])->name('students.index');
+    Route::delete('/courses/{course}/students/{student}', [CourseController::class, 'destroyStudent'])->name('courses.students.destroy');
 });
 

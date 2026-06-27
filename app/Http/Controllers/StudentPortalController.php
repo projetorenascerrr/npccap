@@ -156,6 +156,23 @@ class StudentPortalController extends Controller
         return redirect()->route('student.profile.edit')->with('success', 'Perfil atualizado com sucesso!');
     }
 
+    public function cancelEnrollment(\App\Models\Student $student)
+    {
+        $studentUser = Auth::guard('student')->user();
+
+        if ($student->student_user_id !== $studentUser->id) {
+            abort(403, 'Ação não autorizada.');
+        }
+
+        if ($student->certificates()->exists() || $student->status === \App\Models\Student::STATUS_CERTIFICADO) {
+            return back()->with('error', 'Não é possível cancelar inscrição de curso concluído ou com certificado emitido.');
+        }
+
+        $student->delete();
+
+        return redirect()->route('student.dashboard')->with('success', 'Inscrição cancelada com sucesso!');
+    }
+
     private function normalizeCpf(string $cpf): string
     {
         $onlyNumbers = preg_replace('/\D/', '', $cpf) ?? '';

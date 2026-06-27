@@ -114,7 +114,14 @@
                                 @endif
                             </td>
                             <td class="text-end">
-                                <a class="btn btn-sm btn-outline-warning" href="{{ route('courses.students.edit', [$course, $student]) }}">Editar</a>
+                                <div class="d-flex justify-content-end gap-2">
+                                    <a class="btn btn-sm btn-outline-warning" href="{{ route('courses.students.edit', [$course, $student]) }}">Editar</a>
+                                    <form method="POST" action="{{ route('courses.students.destroy', [$course, $student]) }}" class="d-inline" onsubmit="return confirm('Deseja realmente remover o aluno deste curso?');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">Remover</button>
+                                    </form>
+                                </div>
                             </td>
                         </tr>
                         @empty

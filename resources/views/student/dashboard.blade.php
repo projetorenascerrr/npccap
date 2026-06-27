@@ -200,7 +200,7 @@
                                 <th class="py-3 bg-transparent text-soft font-semibold text-center">Frequência</th>
                                 <th class="py-3 bg-transparent text-soft font-semibold text-center">Nota</th>
                                 <th class="py-3 bg-transparent text-soft font-semibold text-center">Status</th>
-                                <th class="px-4 py-3 bg-transparent text-soft font-semibold text-end">Certificado</th>
+                                <th class="px-4 py-3 bg-transparent text-soft font-semibold text-end">Ações / Certificado</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -242,15 +242,27 @@
                                     @endif
                                 </td>
                                 <td class="px-4 py-3 text-end">
-                                    @if($enrollment->certificate)
-                                    <a href="{{ route('student.certificates.pdf', $enrollment->certificate) }}" target="_blank" class="btn btn-certificate btn-sm text-white px-3 py-1.5 rounded-3">
-                                        <i class="bi bi-cloud-arrow-down-fill me-1"></i> Baixar PDF
-                                    </a>
-                                    @elseif($enrollment->status === \App\Models\Student::STATUS_CERTIFICADO)
-                                    <span class="text-soft small"><i class="bi bi-clock me-1"></i> Aguardando emissão</span>
-                                    @else
-                                    <span class="text-soft small"><i class="bi bi-lock-fill me-1"></i> Não liberado</span>
-                                    @endif
+                                    <div class="d-flex justify-content-end align-items-center gap-2">
+                                        @if($enrollment->certificate)
+                                        <a href="{{ route('student.certificates.pdf', $enrollment->certificate) }}" target="_blank" class="btn btn-certificate btn-sm text-white px-3 py-1.5 rounded-3">
+                                            <i class="bi bi-cloud-arrow-down-fill me-1"></i> Baixar PDF
+                                        </a>
+                                        @elseif($enrollment->status === \App\Models\Student::STATUS_CERTIFICADO)
+                                        <span class="text-soft small"><i class="bi bi-clock me-1"></i> Aguardando emissão</span>
+                                        @else
+                                        <span class="text-soft small"><i class="bi bi-lock-fill me-1"></i> Não liberado</span>
+                                        @endif
+
+                                        @if(!$enrollment->certificate && $enrollment->status !== \App\Models\Student::STATUS_CERTIFICADO)
+                                        <form method="POST" action="{{ route('student.enrollment.cancel', $enrollment) }}" onsubmit="return confirm('Deseja realmente cancelar sua inscrição neste curso?');" class="d-inline">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-outline-danger btn-sm rounded-3">
+                                                Cancelar Inscrição
+                                            </button>
+                                        </form>
+                                        @endif
+                                    </div>
                                 </td>
                             </tr>
                             @endforeach
