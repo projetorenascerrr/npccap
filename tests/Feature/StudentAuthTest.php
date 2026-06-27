@@ -414,6 +414,41 @@ class StudentAuthTest extends TestCase
         $this->assertStringContainsString('87654321', $pdfView);
         $this->assertStringContainsString('FEDCBA98', $pdfView);
     }
+
+    public function test_admin_can_access_students_list_page_and_search()
+    {
+        $admin = \App\Models\User::factory()->create();
+
+        $studentUser = StudentUser::create([
+            'name' => 'Aluno Teste Especial',
+            'cpf' => '123.456.789-01',
+            'email' => 'teste.especial@exemplo.com',
+            'password' => bcrypt('password123'),
+        ]);
+
+        $course = Course::create([
+            'name' => 'Curso de Teste',
+            'status' => 'ativo',
+        ]);
+
+        $student = Student::create([
+            'course_id' => $course->id,
+            'student_user_id' => $studentUser->id,
+            'status' => 'inscrito',
+        ]);
+
+        $this->actingAs($admin, 'web');
+
+        // 1. Access main students list page
+        $response = $this->get('/admin/students');
+        $response->assertStatus(200);
+        $response->assertSee('Aluno Teste Especial');
+
+        // 2. Search for the student
+        $responseSearch = $this->get('/admin/students?search=Especial');
+        $responseSearch->assertStatus(200);
+        $responseSearch->assertSee('Aluno Teste Especial');
+    }
 }
 
 
